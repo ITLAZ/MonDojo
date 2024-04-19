@@ -1,23 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body, html{
+:root{
+    --primary-color: #192847;
+    --secondary-color: #B7D8E6;
+    --alt-primary-color: #D48600;
+    --alt-secondary-color: #F9BF03;
+    --dark-color: #0D0D0D;
+    --light-color: #FAF7E6;
+}
+
+body{
     height: 100%;
+    width: 100%;
     font-family: 'Poppins', sans-serif;
-    overflow-y: hidden;
+    background-image: url('../images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 header{
     width: 100%;
-    height: 100px;
+    height: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    background: #ccc;
-    padding: 40px;
+    background: var(--dark-color);
+    padding: 20px;
+}
+
+.head-logo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 120px;
+    width: 120px;
 }
 
 .container{
@@ -25,11 +48,105 @@ header{
     height: 100%;
     display: flex;
     justify-content: center;
-    background: #f1f1f1;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    padding: 30px;
 }
+
+.form-container{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: var(--dark-color);
+    border: 4px solid var(--light-color);
+    color: var(--light-color);
+    border-radius: 50px;
+    padding: 20px;
+    box-shadow: 0 0 10px var(--dark-color);
+}
+
+.form-container h3{
+    color: var(--alt-primary-color);
+    font-family: 'Bangers', cursive;
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.form-container form{
+    width: 80%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 20px;
+}
+
+.input-container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'bangers', cursive;
+    gap: 5px;
+}
+
+.input-container label{
+    font-size: 20px;
+}
+
+.input-container input{
+    width: 100%;
+    height: 40px;
+    border: 3px solid var(--primary-color);
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 20px;
+}
+
+.input-container button{
+    width: 50%;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid var(--light-color);
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 20px;
+    background: var(--primary-color);
+    color: var(--alt-primary-color);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.input-containern span{
+    font-size: 15px;
+    color: var(--alt-primary-color);
+}
+
+.input-container span a{
+    color: var(--light-color);
+    text-decoration: none;
+}
+
+.input-container span a:hover{
+    color: var(--alt-secondary-color);
+}
+
+.input-container button:hover{
+    background: var(--alt-secondary-color);
+    color: var(--dark-color);
+    border: 3px solid var(--dark-color);
+}
+
+.form-logo{
+    width: 200px;
+    height: 200px;
+    display: flex;
+}
+
 
 .rating-closing{
     display: flex;
@@ -44,19 +161,20 @@ header{
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #f1f1f1;
-    border: none;
+    background: var(--primary-color);
+    border: 3px solid var(--light-color);
     border-radius: 20px;
     padding: 10px;
-    color: #333;
+    color: var(--alt-primary-color);
     font-size: 15px;
     cursor: pointer;
     transition: 0.3s;
 }
 
 .rating-closing button:hover{
-    background: #333;
-    color: #fff;
+    background: var(--alt-secondary-color);
+    color: var(--dark-color);
+    border: 3px solid var(--dark-color);
 }
 
 .socials{
@@ -74,22 +192,23 @@ header{
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #f1f1f1;
+    background: var(--primary-color);
     border-radius: 50%;
-    color: #333;
+    color: var(--alt-primary-color);
     font-size: 20px;
+    border: 3px solid var(--light-color);
     transition: 0.3s;
 }
 
 .socials a:hover{
-    background: #333;
-    color: #fff;
+    background: var(--alt-secondary-color);
+    color: var(--dark-color);
+    border: 3px solid var(--dark-color);
 }
 
 .navbar{
     width: 100%;
     height: fit-content;
-    background: #f1f1f1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -105,12 +224,12 @@ header{
 
 .navbar a{
     text-decoration: none;
-    color: #333;
+    color: var(--light-color);
     font-size: 20px;
     transition: 0.3s;
 }
 
 .navbar a:hover{
-    color: #f341f1;
+    color: var(--alt-secondary-color);
 }
 
