@@ -186,7 +186,7 @@ header {
   height: 70px;
   line-height: 40px;
   /* background-color: rgba(0, 0, 0, 0.200); */
-  background-color: #262626;
+  background-color: #192847;
   position: fixed;
   top: 0;
   left: 0;
@@ -243,6 +243,13 @@ header {
     margin-right: 500px;
     margin-top: 15px;
   }
+
+  .logo1 img {
+    display: block; /* Asegura que la imagen se muestre correctamente */
+    margin: auto; /* Centra la imagen horizontalmente */
+    height: 50px; /* Ajusta la altura según sea necesario */
+}
+
 
   a:hover {
     background-color: #192847;
