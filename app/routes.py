@@ -11,11 +11,33 @@ import datetime
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime as dt
 
+#funcion para asignar permiso de acceso a rol
+def redirect_based_on_role(user):
+    if user.rol_id_rol == 'cliente':
+        return redirect(url_for('inicio_usuario'))
+    elif user.rol_id_rol == 'admin':
+        return redirect(url_for('adminpanel'))
+    else:
+        flash('Rol no reconocido, acceso denegado.', 'error')
+        return redirect(url_for('login'))
+
+#panel user - ruta progetida
+@app.route('/inicio_usuario')
+@login_required
+def inicio_usuario():
+    return render_template('inicio_usuario.html')
+
+#panel admi - ruta protegida
+@app.route('/adminpanel')
+@login_required
+def adminpanel():
+    return render_template('adminpanel.html')
+
 # Ruta principal que muestra la página de inicio
 @app.route('/')
 # @login_required protege la ruta
 def index():
-    return render_template('index.html')
+    return render_template('inicio.html')
 
 # Ruta de registro de usuarios con manejo de errores en la creacicn y validacion
 @app.route('/register', methods=['GET', 'POST'])
@@ -43,7 +65,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             flash('Registro exitoso. Bienvenido!', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('login'))
         except SQLAlchemyError as e:
             db.session.rollback()
             app.logger.error(f'Error de base de datos: {str(e)}')
@@ -119,7 +141,7 @@ def verify_security_question():
             login_user(user, remember=True)  
             registro_actividad(user.id_usuario)
             flash('Inicio de sesión exitoso.', 'success')
-            return redirect(url_for('index'))
+            return redirect_based_on_role(user)
         else:
             flash('Respuesta incorrecta.', 'error')
             return redirect(url_for('verify_security_question'))
@@ -156,7 +178,7 @@ def register_google():
                 db.session.commit()
                 login_user(user) 
                 flash('Registro exitoso con Google. Bienvenido!', 'success')
-                return redirect(url_for('index'))
+                return redirect(url_for('inicio_usuario'))
             except Exception as e:
                 db.session.rollback()
                 flash('Error al guardar en la base de datos.', 'error')
@@ -164,7 +186,7 @@ def register_google():
                 return redirect(url_for('register'))
         else:
             login_user(user)  
-            return redirect(url_for('index'))
+            return redirect(url_for('login'))
 
     flash('No se pudo acceder a la información de Google.', 'error')
     return redirect(url_for('register'))
@@ -189,7 +211,7 @@ def login_google():
             db.session.add(actividad)
             db.session.commit()
             flash('Inicio de sesión exitoso con Google.', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('inicio_usuario'))
         else:
             # Aquí podrías manejar el caso en que el usuario no esté registrado aún
             flash('No existe una cuenta asociada a este correo de Google.', 'error')
@@ -240,8 +262,11 @@ def new_password():
         if user:
             user.password = generate_password_hash(new_password)
             db.session.commit()
+            registro_actividad(user.id_usuario)
+
             flash('Tu contraseña ha sido actualizada.', 'success')
-            return redirect(url_for('index'))
+            return redirect_based_on_role(user)
+        
         else:
             flash('Usuario no encontrado.', 'error')
 
