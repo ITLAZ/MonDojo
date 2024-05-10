@@ -9,7 +9,7 @@
   justify-content: space-between; /* Centra todos los elementos del navbar horizontalmente */
   align-items: center;
   background-color: #262626;
-  padding: 30px 30px;
+  padding: 50px;
   position: fixed;
   top: 0;
   width: 100%;
@@ -20,6 +20,7 @@
   list-style: none;
   display: flex;
   align-items: center;
+  justify-content: center;
   position: absolute; /* Posiciona absolutamente dentro del navbar */
   left: 0; /* Comienza desde el extremo izquierdo */
   right: 0; /* Extiende hasta el extremo derecho */
@@ -36,11 +37,12 @@
 .btn-login {
   position: absolute;
   right: 20px; /* Posiciona el botón de inicio de sesión en el extremo derecho */
-  top: 20px; /* Ajusta la posición vertical si es necesario */
+  top: 9px; /* Ajusta la posición vertical si es necesario */
   padding: 10px 20px;
   background-color: #192847;
   color: #faf7e6;
   border-radius: 5px;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {
