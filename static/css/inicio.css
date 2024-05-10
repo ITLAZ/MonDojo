@@ -44,6 +44,7 @@
   /* Ajusta el tamaño del logo si es necesario */
 }
 
+ /* BOTON LOGIN */
 .btn-login {
   position: absolute;
   right: 20px;
@@ -57,10 +58,27 @@
   justify-content: center;
 }
 
+ /* BOTON LOGOUT */
+.btn-logout{
+  position: absolute;
+  right: 20px;
+  /* Posiciona el botón de inicio de sesión en el extremo derecho */
+  top: 9px;
+  /* Ajusta la posición vertical si es necesario */
+  padding: 10px 20px;
+  background-color: #b7d8e6;
+  color: #262626;
+  border-radius: 5px;
+  justify-content: center;
+}
+
 @media (max-width: 768px) {
 
   .nav-links,
   .btn-login {
+    display: none;
+  }
+  .btn-logout {
     display: none;
   }
 
