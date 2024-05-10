@@ -396,3 +396,14 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+#migrations
+migrations/
+
+#config
+venv/
+localhost-key.pem
+localhost.pem
+
+__init__.py
+
