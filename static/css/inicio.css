@@ -5,12 +5,21 @@
   font-family: 'Baloo Bhai 2', cursive;
 }
 
+:root {
+  --primary-color: #192847;
+  --secondary-color: #B7D8E6;
+  --alt-primary-color: #D48600;
+  --alt-secondary-color: #F9BF03;
+  --dark-color: #0D0D0D;
+  --light-color: #FAF7E6;
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
   /* Centra todos los elementos del navbar horizontalmente */
   align-items: center;
-  background-color: #262626;
+  background-color: var(--primary-color);
   padding: 50px;
   position: fixed;
   top: 0;
@@ -40,7 +49,7 @@
   /* Mueve el logo al centro */
   transform: translateX(-50%);
   /* Centra precisamente el logo */
-  height: 50px;
+  height: 80px;
   /* Ajusta el tamaño del logo si es necesario */
 }
 
@@ -48,7 +57,7 @@
   position: absolute;
   right: 20px;
   /* Posiciona el botón de inicio de sesión en el extremo derecho */
-  top: 9px;
+  top: 20px;
   /* Ajusta la posición vertical si es necesario */
   padding: 10px 20px;
   background-color: #192847;
@@ -107,14 +116,13 @@ ul {
 nav a {
   color: #faf7e6;
   text-decoration: none;
-
+  transition: all 0.3s ease-in-out;
 }
 
 a:hover {
-  background-color: #d48600;
+  color: #d48600;
   border-radius: 20px;
   border-color: #faf7e6;
-  padding: 10px;
 }
 
 .btn {
