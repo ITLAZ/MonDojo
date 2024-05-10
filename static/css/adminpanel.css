@@ -51,7 +51,6 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    gap: 10px;
 }
 
 .nav-items li {
@@ -63,7 +62,7 @@ body {
 .nav-items li a {
     text-decoration: none;
     color: var(--light-color);
-    font-size: 1.2rem;
+    font-size: 20px;
     transition: all 0.3s ease-in-out;
 }
 
@@ -128,6 +127,8 @@ body {
 @media (max-width: 768px) {
     .navbar {
         padding: 20px;
+        width: 100%;
+        height: 100%;
     }
 
     .nav-logo {
@@ -137,12 +138,12 @@ body {
     }
 
     .nav-logo img {
-        height: 80%;
-        width: 80%;
+        height: 60px;
+        width: 60px;
     }
 
     .nav-items li a {
-        font-size: 1rem;
+        font-size: 10px;
     }
 
     .option a {
@@ -167,7 +168,7 @@ body {
     }
 
     .nav-items li a {
-        font-size: 0.8rem;
+        font-size: 10px;
     }
 
     .option a {
