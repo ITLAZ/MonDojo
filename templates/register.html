@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Monster Dojo - Registrarse</title>
     <link rel="stylesheet" href="../static/css/userforms.css">
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
     <nav class="navbar">
         <div class="nav-logo">
@@ -13,14 +15,10 @@
         </div>
         <ul class="nav-items">
             <li><a href="">Inicio</a></li>
-            <li><a href="">Usuarios</a></li>
             <li><a href="">Juegos</a></li>
             <li><a href="">Comida</a></li>
-            <li><a href="">Mesas</a></li>
             <li><a href="">Reservas</a></li>
-            <li><a href="">Pedidos</a></li>
-            <li><a href="">Empleados</a></li>
-            <li><a href="">Cerrar Sesion</a></li>
+            <li><a href="">Iniciar Sesion</a></li>
         </ul>
     </nav>
     <div class="container">
@@ -47,7 +45,7 @@
                     <input type="password" id="password" name="password" required>
                     <span class="error-message" id="error-password"></span>
                 </div>
-                
+
                 <div class="input-container">
                     <label for="confirm-password">Verificar Contraseña</label>
                     <input type="password" id="confirm-password" name="confirm-password" required>
@@ -55,7 +53,8 @@
                 </div>
                 <div class="input-container">
                     <label for="pregunta">Pregunta de Seguridad</label>
-                    <input type="text" id="pregunta" name="pregunta" required placeholder="Ejemplo: ¿Cuál es el nombre de tu mascota?">
+                    <input type="text" id="pregunta" name="pregunta" required
+                        placeholder="Ejemplo: ¿Cuál es el nombre de tu mascota?">
                 </div>
                 <div class="input-container">
                     <label for="respuesta">Respuesta de Seguridad</label>
@@ -64,80 +63,82 @@
                 <div class="input-container">
                     <button type="submit">Registrarse</button>
                     <span>¿Ya tienes una cuenta? <a href="/login">Inicia sesión</a></span>
-                </div> 
+                </div>
                 <div>
                     <a href="{{ url_for('register_google') }}" class="google-btn">Registrarse con Google</a>
                 </div>
-                
-    </div>
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const form = document.getElementById("registration-form");
-        form.addEventListener("submit", function(event) {
-            let valid = true;
-    
-            const email = document.getElementById("email");
-            const name = document.getElementById("name");
-            const phone = document.getElementById("phone");
-            const password = document.getElementById("password");
-            const confirmPassword = document.getElementById("confirm-password");
-    
-            // Limpiar mensajes de error anteriores
-            document.querySelectorAll('.error-message').forEach(function(element) {
-                element.textContent = '';
+
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.getElementById("registration-form");
+                form.addEventListener("submit", function (event) {
+                    let valid = true;
+
+                    const email = document.getElementById("email");
+                    const name = document.getElementById("name");
+                    const phone = document.getElementById("phone");
+                    const password = document.getElementById("password");
+                    const confirmPassword = document.getElementById("confirm-password");
+
+                    // Limpiar mensajes de error anteriores
+                    document.querySelectorAll('.error-message').forEach(function (element) {
+                        element.textContent = '';
+                    });
+
+                    // Validación de email
+                    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+                    if (!email.value.match(emailRegex)) {
+                        document.getElementById('error-email').textContent = "Por favor ingresa un correo electrónico válido.";
+                        valid = false;
+                    }
+
+                    // Validación de nombre
+                    if (!name.value.trim()) {
+                        document.getElementById('error-name').textContent = "El nombre no puede estar vacío.";
+                        valid = false;
+                    }
+
+                    // Validación de teléfono
+                    const phoneRegex = /^\d+$/; // Solo números
+                    if (!phone.value.match(phoneRegex)) {
+                        document.getElementById('error-phone').textContent = "Por favor ingresa un número de teléfono válido. Solo se permiten números.";
+                        valid = false;
+                    }
+
+                    // Validación de contraseña
+                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                    if (!password.value.match(passwordRegex)) {
+                        document.getElementById('error-password').textContent = "La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula, una letra minúscula, un número y un caracter especial.";
+                        valid = false;
+                    }
+
+                    // Confirmación de contraseña
+                    if (password.value !== confirmPassword.value) {
+                        document.getElementById('error-confirm-password').textContent = "Las contraseñas no coinciden.";
+                        valid = false;
+                    }
+
+                    if (!valid) {
+                        event.preventDefault(); // Solo evita el envío si hay un error
+                    }
+                });
             });
-    
-            // Validación de email
-            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-            if (!email.value.match(emailRegex)) {
-                document.getElementById('error-email').textContent = "Por favor ingresa un correo electrónico válido.";
-                valid = false;
-            }
-    
-            // Validación de nombre
-            if (!name.value.trim()) {
-                document.getElementById('error-name').textContent = "El nombre no puede estar vacío.";
-                valid = false;
-            }
-    
-            // Validación de teléfono
-            const phoneRegex = /^\d+$/; // Solo números
-            if (!phone.value.match(phoneRegex)) {
-                document.getElementById('error-phone').textContent = "Por favor ingresa un número de teléfono válido. Solo se permiten números.";
-                valid = false;
-            }
-    
-            // Validación de contraseña
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-            if (!password.value.match(passwordRegex)) {
-                document.getElementById('error-password').textContent = "La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula, una letra minúscula, un número y un caracter especial.";
-                valid = false;
-            }
-    
-            // Confirmación de contraseña
-            if (password.value !== confirmPassword.value) {
-                document.getElementById('error-confirm-password').textContent = "Las contraseñas no coinciden.";
-                valid = false;
-            }
-    
-            if (!valid) {
-                event.preventDefault(); // Solo evita el envío si hay un error
-            }
-        });
-    });
-</script>
-        
-             
+        </script>
+
+
 </body>
 <style>
-.error-message {
-    color: red;
-    font-size: 0.8em;
-    visibility: visible; /* Asegúrate de que los mensajes sean visibles */
-    height: auto; /* Si estaban ocultos por problemas de altura */
-}
+    .error-message {
+        color: red;
+        font-size: 0.8em;
+        visibility: visible;
+        /* Asegúrate de que los mensajes sean visibles */
+        height: auto;
+        /* Si estaban ocultos por problemas de altura */
+    }
 
-.google-btn {
+    .google-btn {
         display: inline-block;
         background-color: #db4437;
         color: white;
@@ -148,9 +149,10 @@
         text-decoration: none;
         font-weight: bold;
     }
+
     .google-btn:hover {
         background-color: #c23321;
     }
+</style>
 
-</style> 
 </html>
