@@ -12,37 +12,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <!-- Link css -->
     <link rel="stylesheet" href="/static/css/inicio.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
 </head>
-<body>
-
+<body>   
 <div class="container">
-    
 <header>
-    <nav class="navbar">
-        <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">Sobre nosotros</a></li>
-            <div class="logo"><img src="/static/images/logo.png" alt=""></div>
-            <li><a href="#menu">Menú</a></li>
-            <li><a href="#order">Ubicación</a></li>
-            <li><a href="login.html"><button class="btn-login">Iniciar Sesión</button></a></li>
-        </ul>
-    </nav>
-<div id="mobile">
-    <div class="logo1"><img src="/static/images/logo_md.png" alt="Monster Dojo Logo" style="height: 50px;"></div>
-    <ul>
-        <li><a href="#home">Inicio</a></li>
-        <li><a href="#menu">Productos</a></li>
-        <li><a href="#about">Sobre Nostros</a></li>
-        <li><a href="#order">Ubicación</a></li>
-    </ul>
-</div>
 
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="nav-logo">
+            <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <button class="menu-toggle" id="mobile-menu">
+            <span class="fas fa-bars"></span>
+        </button>
+        <div class="navbar-right">
+            <a href="/">Home</a>
+            <a href="#about">Sobre Nosotros</a>
+            <a href="#menu">Menu</a>
+            <a href="#order">Ubicación</a>
+            <a href="/templates/login.html">Iniciar Sesión</a>
+        </div>
+    </div>
+    
+    <!-- DESCRIPCIÓN -->
 <div class="overlay">
-<section id="home">
+<section id="home" >
     <h1 class="h-primary">Bienvenidos a Monster Dojo</h1>
     <br>
-    <p> Un espacio para disfrutar de deliciosa comida, bebidas calientes y frías y, sobre todo, ¡juegos de mesa!</p>
     <button class="btn">Ordena ahora 📲</button>
 </section>
 </div>
@@ -113,7 +110,7 @@
 <div id="about">
     <h1 class="title">Sobre Nosotros ✨ </h1>
     <div class="about_row">
-        <div class="about_column">
+        <div class="about_column" style="text-align: justify;">
     <p> ¡Bienvenidos a Monster Dojo! Somos más que un restaurante: somos tu destino ideal para disfrutar de una experiencia única combinando deliciosas comidas y bebidas con entretenimiento sin igual. 
         En Monster Dojo, te ofrecemos una variada selección de juegos de mesa que prometen horas de diversión y risas. Nuestro compromiso con una atención de primera y ambientes acogedores hacen de cada visita una ocasión especial. Además, facilitamos tu comodidad con servicios en línea para que puedas disfrutar de nuestra oferta gastronómica y de entretenimiento desde donde estés. Ven a descubrir por qué en Monster Dojo, cada momento es una aventura deliciosa y divertida.</p>
 </div>
@@ -155,13 +152,21 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const menuButton = document.querySelector('.btn-menu');
-        const navLinks = document.querySelector('.nav-links');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const navRight = document.querySelector('.navbar-right');
+    const navLinks = document.querySelectorAll('.navbar-right a'); // Selecciona todos los enlaces
 
-        menuButton.addEventListener('click', function() {
-            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+    mobileMenu.addEventListener('click', function() {
+        navRight.classList.toggle('active'); // Activa o desactiva la visibilidad de los enlaces
+    });
+
+    // Agrega evento a cada enlace para cerrar el menú cuando se haga clic
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            navRight.classList.remove('active'); // Cierra el menú cuando se selecciona un enlace
         });
     });
+});
 </script>
 
 </html>
