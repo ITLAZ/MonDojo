@@ -95,7 +95,7 @@ body {
     width: 100%; /* Ocupa todo el ancho (esto ya debería estar cubierto por el reset CSS) */
 }
 .form-container {
-    width: 70%;
+    width: 60%;
     height: auto;
     display: flex;
     justify-content: center;

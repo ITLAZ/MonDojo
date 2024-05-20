@@ -1,0 +1,105 @@
+.navbar {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    overflow: hidden;
+    background-color: #192847; 
+    padding: 10px 20px; 
+    position: fixed;
+    width: 100%;
+    top: 0;
+    box-sizing: border-box;
+    z-index: 1050; 
+}
+
+.nav-logo {
+    height: 70px;
+    width: 70px;
+    background-color: #FAF7E6;
+    border: solid #FAF7E6 1px;
+    border-radius: 50%;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-logo img {
+    height: 100%; 
+    width: auto;
+}
+
+.navbar-right {
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+    width: auto;
+}
+
+.menu-toggle {
+    display: none; 
+    font-size: 30px; 
+    color: #faf7e6; 
+    background: none; 
+    border: none; 
+    padding: 10px; 
+    cursor: pointer; 
+    position: absolute;
+    right: 20px; 
+    top: 15px; 
+    z-index: 1500; 
+}
+
+.navbar a {
+    color: #faf7e6;
+    font-weight: bold;
+    text-align: center;
+    padding: 12px 25px; 
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.navbar-right a:hover {
+    background-color: #d48600;
+    border-radius: 25px;
+}
+
+/* RESPONSIVE PARA MOBILE*/
+@media screen and (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .navbar-right {
+        display: flex;
+        flex-direction: column; 
+        position: fixed;
+        top: 90px; 
+        right: 0; 
+        width: 70%;
+        max-width: 300px; 
+        height: 100vh; 
+        background: rgba(25, 40, 71, 0.95); 
+        transform: translateX(100%); 
+        transition: transform 0.3s ease-in-out; 
+        z-index: 1500; 
+    }
+    
+    .navbar-right.active {
+        transform: translateX(0); 
+    }
+    
+    .navbar a {
+        color: #faf7e6;
+        font-weight: bold;
+        text-align: center;
+        padding: 15px;
+        text-decoration: none;
+        font-size: 18px;
+        border-bottom: 1px solid #faf7e6; 
+    }
+    
+    .navbar-right a:hover {
+        background-color: #d48600;
+        border-radius: 25px; 
+    }
+}
