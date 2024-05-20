@@ -287,31 +287,3 @@ from flask import redirect, url_for, flash
 from functools import wraps
 from flask_login import current_user
 
-#manejo de permisos a roles permitiendo usuarios 
-
-# def role_required(*roles):
-#     def wrapper(fn):
-#         @wraps(fn)
-#         def decorated_view(*args, **kwargs):
-#             if not current_user.is_authenticated:
-#                 flash("Por favor inicia sesión para acceder a esta página.", "info")
-#                 return redirect(url_for('login'))
-#             if current_user.rol_id_rol not in roles:
-#                 flash("No tienes permiso para acceder a esta página.", "error")
-#                 return redirect(url_for('index'))  # O alguna otra página de "acceso denegado"
-#             return fn(*args, **kwargs)
-#         return decorated_view
-#     return wrapper
-
-# @app.route('/inicio_user')
-# @login_required
-# @role_required('cliente')
-# def inicio_user():
-#     return render_template('InicioUser.html')
-
-# @app.route('/inicio_admin')
-# @login_required
-# @role_required('administrador')
-# def inicio_admin():
-#     return render_template('InicioAdmin.html')
-
