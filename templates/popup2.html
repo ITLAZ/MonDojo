@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/popup.css">
+    <!-- Link fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <title>Editar Usuario</title>
+</head>
+<body>
+    <div class="popup" id="contactPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup()">&times;</span>
+            <img src="/static/images/editar_usuario.png" alt="User Icon" class="user-icon">
+            <h2>EDITAR USUARIO</h2>
+            <div class="step-indicator">
+                <div class="step-container">
+                    <span class="step" onclick="showTab(0)" id="step1">1</span>
+                    <span class="step-line"></span>
+                    <span class="step" onclick="showTab(1)" id="step2">2</span>
+                    <span class="step-line"></span>
+                    <span class="step" onclick="showTab(2)" id="step3">3</span>
+                </div>
+            </div>
+            <form id="regForm">
+                <div class="tab">
+                    <label for="name">Nombre</label>
+                    <input type="text" id="name" name="name" required>
+                    <label for="email">Correo</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="tab">
+                    <label for="date">Fecha de Nacimiento</label>
+                    <input type="date" id="date" name="date" required>
+                    <label for="phone">Telefono</label>
+                    <input type="text" id="phone" name="phone" required>
+                </div>
+                <div class="tab">
+                    <label for="password">Contraseña</label>
+                    <input type="text" id="password" name="password" required>
+                    <button type="submit">Guardar Cambios</button>
+                    <button type="button" onclick="clearForm()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 0;
+        showTab(currentTab);
+
+        function showTab(n) {
+            let tabs = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].style.display = "none";
+            }
+            tabs[n].style.display = "block";
+
+            let steps = document.getElementsByClassName("step");
+            let lines = document.getElementsByClassName("step-line");
+            for (let i = 0; i < steps.length; i++) {
+                steps[i].className = steps[i].className.replace(" active", "");
+                if (i < lines.length) {
+                    lines[i].className = lines[i].className.replace(" active", "");
+                }
+            }
+            steps[n].className += " active";
+            for (let i = 0; i < n; i++) {
+                lines[i].className += " active";
+            }
+        }
+
+        function closePopup() {
+            document.getElementById('contactPopup').style.display = 'none';
+        }
+
+        function clearForm() {
+            document.querySelector("form").reset();
+        }
+    </script>
+</body>
+</html>

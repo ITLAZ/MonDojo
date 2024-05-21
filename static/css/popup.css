@@ -1,0 +1,154 @@
+body {
+    font-family: 'Baloo Bhai 2', cursive;
+}
+
+.popup {
+    display: block; /* Cambia a 'none' para ocultar el pop-up inicialmente */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /*background-color: rgba(196, 186, 186, 0.5);*/
+    z-index: 1000;
+}
+
+.popup-content {
+    position: relative;
+    margin: 10% auto;
+    padding: 20px;
+    width: 300px;
+    background-color: #1c1c1c;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #faf7e6;
+}
+
+.user-icon {
+    width: 100px;
+    height: 100px;
+}
+
+h2 {
+    font-size: 30px;
+    margin-bottom: 20px;
+    color: #d48600;
+    font-family: 'Bangers', system-ui;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+label {
+    margin: 10px 0 5px;
+    text-align: left;
+    color: #faf7e6;
+}
+
+input[type="text"], input[type="email"], input[type="date"] {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #faf7e6;
+    background-color: #333;
+}
+
+input[type="date"] {
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    color: #faf7e6;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    padding: 10px;
+    width: 48%;
+    background-color: #192847;
+    border-color: #faf7e6;
+    border-radius: 30px;
+    color: #d48600;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #d48600;
+    color: black;
+}
+
+button[type="button"] {
+    background-color: #192847;
+}
+
+button[type="button"]:hover {
+    background-color: #d48600;
+    color: black;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.step-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background-color: #ccc;
+    margin: 0 10px;
+}
+
+.step-line.active {
+    background-color: #d48600;
+}
+
+.step {
+    width: 30px;
+    height: 30px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    cursor: pointer;
+    background-color: #1c1c1c;
+    z-index: 1;
+    position: relative;
+}
+
+.step.active {
+    border-color: #d48600;
+    color: #d48600;
+}
+
+.tab {
+    display: none;
+}
