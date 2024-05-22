@@ -123,7 +123,7 @@ body {
     cursor: pointer;
 }
 
-.add-user{
+.add-user {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -145,6 +145,7 @@ table {
     width: 100%;
     height: 100%;
     padding: 20px;
+    border-collapse: collapse; /* Añadido para evitar espacios entre celdas */
 }
 
 th {
@@ -152,6 +153,24 @@ th {
     color: var(--light-color);
     padding: 10px;
     text-align: center;
+    position: relative;
+    display: table-cell; /* Cambiado de flex a table-cell */
+    vertical-align: middle; /* Alineación vertical central */
+}
+
+th .filter-btn {
+    background: transparent;
+    border: none;
+    margin-left: 5px;
+    color: var(--light-color);
+    font-size: 14px; /* Ajuste del tamaño del icono */
+    vertical-align: middle; /* Alineación vertical central */
+    width: 20px; /* Tamaño fijo */
+    height: 20px; /* Tamaño fijo */
+    display: inline-block; /* Asegurar que sea de tipo inline-block */
+    padding: 0;
+    line-height: 20px; /* Asegurar la alineación vertical */
+    text-align: center; /* Asegurar la alineación horizontal */
 }
 
 td {
@@ -159,6 +178,7 @@ td {
     color: var(--dark-color);
     padding: 15px;
     text-align: center;
+    border: 1px solid var(--secondary-color); /* Añadido para separar celdas */
 }
 
 td button {
