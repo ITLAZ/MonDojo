@@ -47,60 +47,17 @@
                 </tr>
             </thead>
             <tbody>
+                {% for user in users %}
                 <tr>
-                    <td>John Doe</td>
-                    <td>doejohn@mail.com</td>
-                    <td>1234567890</td>
+                    <td>{{ user.nombre }}</td>
+                    <td>{{ user.correo }}</td>
+                    <td>{{ user.telefono }}</td>
                     <td>
                         <button class="editUserBtn"><i class="fa-solid fa-edit"></i></button>
                         <button><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
-                <tr>
-                    <td>Jane Doe</td>
-                    <td>doejane@mail.com</td>
-                    <td>0987654321</td>
-                    <td>
-                        <button class="editUserBtn"><i class="fa-solid fa-edit"></i></button>
-                        <button><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>John Doe</td>
-                    <td>doejohn@mail.com</td>
-                    <td>1234567890</td>
-                    <td>
-                        <button class="editUserBtn"><i class="fa-solid fa-edit"></i></button>
-                        <button><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Jane Doe</td>
-                    <td>doejane@mail.com</td>
-                    <td>0987654321</td>
-                    <td>
-                        <button class="editUserBtn"><i class="fa-solid fa-edit"></i></button>
-                        <button><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>John Doe</td>
-                    <td>doejohn@mail.com</td>
-                    <td>1234567890</td>
-                    <td>
-                        <button class="editUserBtn"><i class="fa-solid fa-edit"></i></button>
-                        <button><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Jane Doe</td>
-                    <td>doejane@mail.com</td>
-                    <td>0987654321</td>
-                    <td>
-                        <button class="editUserBtn"><i class="fa-solid fa-edit"></i></button>
-                        <button><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

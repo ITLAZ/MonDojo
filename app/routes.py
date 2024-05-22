@@ -283,6 +283,17 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ver tabla usuarios 
+@app.route('/userspanel', methods=['GET'])
+@login_required
+def list_users():
+    # Filtrar usuarios por el atributo rol_id_rol con valor "usuario"
+    users = Usuario.query.filter_by(rol_id_rol='cliente').with_entities(Usuario.id_usuario, Usuario.nombre, Usuario.correo, Usuario.telefono).all()
+    return render_template('userspanel.html', users=users)
+
+
+
+
 from flask import redirect, url_for, flash
 from functools import wraps
 from flask_login import current_user
