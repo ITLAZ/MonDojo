@@ -9,6 +9,19 @@
     <!-- Link fonts -->
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Estilos para las alertas -->
+    <style>
+        .swal2-cancel {
+            background-color: #192847 !important;
+            color: #fff !important;
+        }
+        .swal2-confirm {
+            background-color: #d48600 !important;
+            color: #fff !important;
+            width: 120px !important; 
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -16,14 +29,14 @@
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
         <ul class="nav-items">
-            <li><a href="">Inicio</a></li>
-            <li><a href="">Usuarios</a></li>
-            <li><a href="">Juegos</a></li>
-            <li><a href="">Comida</a></li>
-            <li><a href="">Mesas</a></li>
-            <li><a href="">Reservas</a></li>
-            <li><a href="">Pedidos</a></li>
-            <li><a href="">Empleados</a></li>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/usuarios">Usuarios</a></li>
+            <li><a href="/juegos">Juegos</a></li>
+            <li><a href="/comida">Comida</a></li>
+            <li><a href="/mesas">Mesas</a></li>
+            <li><a href="/reservas">Reservas</a></li>
+            <li><a href="/pedidos">Pedidos</a></li>
+            <li><a href="/empleados">Empleados</a></li>
             <li><a href="/logout">Cerrar Sesion</a></li>
         </ul>
     </nav>
@@ -31,8 +44,8 @@
         <div class="actions-container">
             <form method="GET" action="/SearchUsuario">
                 <div class="search-container">
-                     <input type="text" name="search" placeholder="Buscar usuario">
-                     <button type="submit">Buscar<i class="fa-solid fa-search"></i></button>
+                    <input type="text" name="search" placeholder="Buscar usuario">
+                    <button type="submit">Buscar <i class="fa-solid fa-search"></i></button>
                 </div>
             </form>
 
@@ -57,7 +70,7 @@
                     <td>{{ user.telefono }}</td>
                     <td>
                         <button class="editUserBtn"><i class="fa-solid fa-edit"></i></button>
-                        <button><i class="fa-solid fa-trash"></i></button>
+                        <button class="deleteUserBtn" onclick="confirmDelete(event)"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -66,7 +79,7 @@
     </div>
 
     <!-- REGISTRAR NUEVO USUARIO POP-UP -->
-    <div class="popup" id="contactPopup" style="display: none;">
+    <div class="popup" id="contactPopup">
         <div class="popup-content">
             <span class="close-btn" onclick="closePopup()">&times;</span>
             <img src="../static/images/agregar_usuario.png" alt="User Icon" class="user-icon">
@@ -80,35 +93,40 @@
                     <span class="step" onclick="showTab(2)" id="step3">3</span>
                 </div>
             </div>
-            <form id="regForm">
+            <form id="regForm" onsubmit="showSuccessMessage(event, 'contactPopup', 'regForm', 'Datos registrados con éxito')">
                 <div class="tab">
                     <div class="form-group">
                         <label for="name">Nombre</label>
                         <input type="text" id="name" name="name" required>
-                    </div>
+                        <span class="error-message" id="error-name"></span>
+                    </div> 
                     <div class="form-group">
                         <label for="email">Correo</label>
                         <input type="email" id="email" name="email" required>
-                    </div>
+                        <span class="error-message" id="error-email"></span>
+                    </div>  
                 </div>
-                <div class="tab">
-                    <div class="form-group">
-                        <label for="date">Fecha de Nacimiento</label>
-                        <input type="date" id="date" name="date" required>
-                    </div>
+                <div class="tab"> 
                     <div class="form-group">
                         <label for="phone">Teléfono</label>
                         <input type="text" id="phone" name="phone" required>
+                        <span class="error-message" id="error-phone"></span>
                     </div>
                 </div>
                 <div class="tab">
                     <div class="form-group">
                         <label for="password">Contraseña</label>
                         <input type="password" id="password" name="password" required>
+                        <span class="error-message" id="error-password"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Verificar Contraseña</label>
+                        <input type="password" id="confirm-password" name="confirm-password" required>
+                        <span class="error-message" id="error-confirm-password"></span>
                     </div>
                     <div class="buttons">
                         <button type="submit">Guardar</button>
-                        <button type="button" onclick="clearForm()">Cancelar</button>
+                        <button type="button" onclick="confirmCancel('regForm')">Cancelar</button>
                     </div>
                 </div>
             </form>
@@ -116,7 +134,7 @@
     </div>
 
     <!-- EDITAR USUARIO POP-UP -->
-    <div class="popup" id="editPopup" style="display: none;">
+    <div class="popup" id="editPopup">
         <div class="popup-content">
             <span class="close-btn" onclick="closeEditPopup()">&times;</span>
             <img src="../static/images/editar_usuario.png" alt="User Icon" class="user-icon">
@@ -130,35 +148,30 @@
                     <span class="step" onclick="showEditTab(2)" id="editStep3">3</span>
                 </div>
             </div>
-            <form id="editForm">
+            <form id="editForm" onsubmit="showSuccessMessage(event, 'editPopup', 'editForm', 'Cambios guardados con éxito')">
                 <div class="tab">
                     <div class="form-group">
                         <label for="editName">Nombre</label>
                         <input type="text" id="editName" name="name" required>
+                        <span class="error-message" id="error-edit-name"></span>
                     </div>
+                </div>
+                <div class="tab">
                     <div class="form-group">
                         <label for="editEmail">Correo</label>
                         <input type="email" id="editEmail" name="email" required>
+                        <span class="error-message" id="error-edit-email"></span>
                     </div>
                 </div>
                 <div class="tab">
-                    <div class="form-group">
-                        <label for="editDate">Fecha de Nacimiento</label>
-                        <input type="date" id="editDate" name="date" required>
-                    </div>
                     <div class="form-group">
                         <label for="editPhone">Teléfono</label>
                         <input type="text" id="editPhone" name="phone" required>
-                    </div>
-                </div>
-                <div class="tab">
-                    <div class="form-group">
-                        <label for="editPassword">Contraseña</label>
-                        <input type="password" id="editPassword" name="password" required>
+                        <span class="error-message" id="error-edit-phone"></span>
                     </div>
                     <div class="buttons">
                         <button type="submit">Guardar Cambios</button>
-                        <button type="button" onclick="clearEditForm()">Cancelar</button>
+                        <button type="button" onclick="confirmCancel('editForm')">Cancelar</button>
                     </div>
                 </div>
             </form>
@@ -237,6 +250,69 @@
 
         function clearEditForm() {
             document.getElementById("editForm").reset();
+        }
+
+        function confirmCancel(formType) {
+            let confirmMessage = formType === 'regForm' ? '¿Está seguro de cancelar? Se perderán los datos.' : '¿Está seguro de cancelar? Se perderán sus cambios.';
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: confirmMessage,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No, mantener',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (formType === 'regForm') {
+                        closePopup();
+                        clearForm();
+                    } else {
+                        closeEditPopup();
+                        clearEditForm();
+                    }
+                }
+            });
+        }
+
+        function showSuccessMessage(event, popupId, formId, message) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¡Éxito!',
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            }).then(() => {
+                document.getElementById(popupId).style.display = 'none';
+                document.getElementById(formId).reset();
+            });
+        }
+
+        function confirmDelete(event) {
+            event.preventDefault(); // Prevenir la acción predeterminada del botón
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: '¿Está seguro de eliminar el registro?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'No, cancelar',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Continuar con la acción de eliminar el registro
+                    Swal.fire('¡Eliminado!', 'El registro ha sido eliminado.', 'success');
+                }
+            });
         }
     </script>
 </body>
