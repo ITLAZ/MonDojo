@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart Popup</title>
+    <link rel="stylesheet" href="../static/css/popup_carrito.css">
+</head>
+<body>
+    <div class="popup" id="shoppingCartPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup()">&times;</span>
+            <h2>Shopping Cart</h2>
+            <a href="#" class="remove-all">Remove all</a>
+            <div class="cart-item">
+                <img src="../static/images/food3.jpg" alt="Apple Juice" class="item-image">
+                <div class="item-details">
+                    <h3>Pasta Fettucinne</h3>
+                    <p>Plato</p>
+                    <span class="veg-icon"></span>
+                </div>
+                <div class="item-quantity">
+                    <button class="quantity-btn">+</button>
+                    <span class="quantity">2</span>
+                    <button class="quantity-btn">-</button>
+                </div>
+                <div class="item-price">
+                    <p>15 Bs.</p>
+                    <a href="#" class="remove">Remove</a>
+                </div>
+            </div>
+            <div class="cart-item">
+                <img src="/static/images/food2.jpg" alt="Grapes Juice" class="item-image">
+                <div class="item-details">
+                    <h3>Tiramisú</h3>
+                    <p>1 porción</p>
+                    <span class="veg-icon"></span>
+                </div>
+                <div class="item-quantity">
+                    <button class="quantity-btn">+</button>
+                    <span class="quantity">1</span>
+                    <button class="quantity-btn">-</button>
+                </div>
+                <div class="item-price">
+                    <p>30 Bs.</p>
+                    <a href="#" class="remove">Remove</a>
+                </div>
+            </div>
+            <div class="subtotal">
+                <p>Sub-Total</p>
+                <span class="items-count">2 items</span>
+                <span class="total-price">$6.18</span>
+            </div>
+            <button class="checkout-btn">Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        function closePopup() {
+            document.getElementById('shoppingCartPopup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

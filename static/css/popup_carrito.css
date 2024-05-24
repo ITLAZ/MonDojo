@@ -1,0 +1,164 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.popup {
+    display: block; /* Cambia a 'none' para ocultar inicialmente */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow: auto;
+}
+
+.popup-content {
+    position: relative;
+    margin: 10% auto;
+    padding: 20px;
+    width: 60%;
+    background-color: #1c1c1c;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #faf7e6;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #faf7e6;
+}
+
+.remove-all {
+    float: right;
+    color: red;
+    text-decoration: none;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.item-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+.item-details {
+    flex: 2;
+    padding-left: 10px;
+}
+
+.item-details h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #faf7e6;
+}
+
+.item-details p {
+    margin: 5px 0;
+    color: #faf7e6;
+}
+
+.veg-icon {
+    width: 10px;
+    height: 10px;
+    background-color: green;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.item-quantity {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-btn {
+    background-color: #ddd;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0 5px;
+}
+
+.quantity {
+    width: 20px;
+    text-align: center;
+}
+
+.item-price {
+    text-align: right;
+}
+
+.item-price p {
+    margin: 0;
+    font-size: 18px;
+    color: #faf7e6;
+}
+
+.save-for-later, .remove {
+    display: block;
+    color: blue;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.remove {
+    color: red;
+}
+
+.subtotal {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    border-top: 1px solid #faf7e6;
+    margin-top: 20px;
+}
+
+.subtotal p {
+    margin: 0;
+    font-size: 18px;
+    color: #faf7e6;
+}
+
+.items-count {
+    color: #777;
+}
+
+.total-price {
+    font-size: 24px;
+    color: #faf7e6;
+}
+
+.checkout-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #192847;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    text-align: center;
+    border-color: #faf7e6;
+    border-radius: 20px;
+}
+
+.checkout-btn:hover {
+    background-color: #d48600;
+}
