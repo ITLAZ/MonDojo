@@ -9,6 +9,7 @@ from flask_dance.contrib.google import google
 from .models import Usuario
 import datetime
 from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_required as flask_login_required
 from datetime import datetime as dt
 
 #funcion para asignar permiso de acceso a rol
@@ -20,6 +21,16 @@ def redirect_based_on_role(user):
     else:
         flash('Rol no reconocido, acceso denegado.', 'error')
         return redirect(url_for('login'))
+
+#logout con seguridad
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()  
+    session.clear()  
+    flash('Has cerrado sesión correctamente.', 'info')
+    return redirect(url_for('inicio'))  
+
 
 #panel user - ruta progetida
 @app.route('/inicio_usuario')
@@ -35,8 +46,7 @@ def adminpanel():
 
 # Ruta principal que muestra la página de inicio
 @app.route('/')
-# @login_required protege la ruta
-def index():
+def inicio():
     return render_template('inicio.html')
 
 # Ruta de registro de usuarios con manejo de errores en la creacicn y validacion
@@ -273,15 +283,6 @@ def new_password():
     return render_template('new_password.html')
 
 
-# proteger rutas - utilizado para proteger rutas que requieren login y autenticacion del usuario
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            flash('Tu sesión ha expirado, por favor inicia sesión de nuevo.', 'info')
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 # ver tabla usuarios 
 @app.route('/userspanel', methods=['GET'])
@@ -291,6 +292,48 @@ def list_users():
     users = Usuario.query.filter_by(rol_id_rol='cliente').with_entities(Usuario.id_usuario, Usuario.nombre, Usuario.correo, Usuario.telefono).all()
     return render_template('userspanel.html', users=users)
 
+
+#busqueda de usuario
+@app.route('/SearchUsuario')
+@login_required
+def usuarios():
+    search_query = request.args.get('search', '')
+    if search_query:
+        users = Usuario.query.filter(Usuario.nombre.ilike(f"{search_query}%")).all()
+    else:
+        users = Usuario.query.all() 
+    return render_template('userspanel.html', users=users)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# proteger rutas - utilizado para proteger rutas que requieren login y autenticacion del usuario
+def login_required(f):
+    @wraps(f)
+    @flask_login_required  # Asegurarse que Flask-Login maneje primero la autenticación
+    
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Tu sesión ha expirado, por favor inicia sesión de nuevo.', 'info')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 

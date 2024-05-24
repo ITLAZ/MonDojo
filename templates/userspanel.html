@@ -24,15 +24,18 @@
             <li><a href="">Reservas</a></li>
             <li><a href="">Pedidos</a></li>
             <li><a href="">Empleados</a></li>
-            <li><a href="">Cerrar Sesion</a></li>
+            <li><a href="/logout">Cerrar Sesion</a></li>
         </ul>
     </nav>
     <div class="container">
         <div class="actions-container">
-            <div class="search-container">
-                <input type="text" placeholder="Buscar usuario">
-                <button>Buscar<i class="fa-solid fa-search"></i></button>
-            </div>
+            <form method="GET" action="/SearchUsuario">
+                <div class="search-container">
+                     <input type="text" name="search" placeholder="Buscar usuario">
+                     <button type="submit">Buscar<i class="fa-solid fa-search"></i></button>
+                </div>
+            </form>
+
             <div class="add-user">
                 <button id="addUserBtn"><i class="fa-solid fa-user-plus"></i> Añadir Usuario</button>
             </div>
