@@ -28,6 +28,17 @@
     background-color: var(--alt-primary-color);
 }
 
+.change-password-btn {
+    width: 100%; /* Ancho completo */
+    max-width: 300px; /* Máximo ancho del botón */
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0.5rem 1rem;
+    display: block; /* Asegura que el botón ocupe todo el ancho del contenedor */
+    text-align: center;
+    font-size: 0.9rem; /* Disminuir el tamaño de la fuente */
+}
+
 .profile-photo-container {
     text-align: center;
     margin-bottom: 20px;
@@ -75,6 +86,17 @@
     color: #888;
 }
 
+.input-container {
+    margin-bottom: 20px;
+}
+
+.change-password-container {
+    display: flex;
+    justify-content: center;
+}
+
 .button-container {
     margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
 }
