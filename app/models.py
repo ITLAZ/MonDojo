@@ -56,6 +56,7 @@ class Juego(db.Model):
     precio_alquiler = db.Column(db.Float, nullable=False)
     precio_venta = db.Column(db.Float, nullable=False)
     disponible_venta = db.Column(db.Boolean, nullable=False)
+    imagen = db.Column(db.String(255), nullable=False)  
     categoria_juego_id_catJuego = db.Column(db.Integer, db.ForeignKey('categoria_juego.id_catJuego'), nullable=False)
 
 class Mesa(db.Model):
@@ -72,7 +73,6 @@ class Pedido(db.Model):
     fecha_hora = db.Column(db.DateTime, nullable=False)
     usuario_id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'), nullable=False)
     mesa_id_mesa = db.Column(db.Integer, db.ForeignKey('mesa.id_mesa'), nullable=False)
-    imagen = db.Column(db.String(250), nullable=True)  # Nuevo campo para la ruta de la imagen
 
 class Producto(db.Model):
     __tablename__ = 'producto'
@@ -81,6 +81,7 @@ class Producto(db.Model):
     descripcion = db.Column(db.String(500), nullable=False)
     precio = db.Column(db.Float, nullable=False)
     max_personas = db.Column(db.Integer, nullable=False)
+    imagen = db.Column(db.String(255), nullable=False)  
     categoria_producto_id_catProducto = db.Column(db.Integer, db.ForeignKey('categoria_producto.id_catProducto'), nullable=False)
 
 class RegistroJuego(db.Model):

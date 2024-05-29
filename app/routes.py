@@ -1,3 +1,4 @@
+import os
 from flask import render_template, redirect, url_for, request, flash,session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -6,14 +7,13 @@ from .models import Usuario, RegistroActividad
 from sqlalchemy.exc import SQLAlchemyError
 from flask import redirect, url_for, flash
 from flask_dance.contrib.google import google
-from .models import Usuario, CategoriaProducto
+from .models import Usuario, CategoriaProducto, Producto
 import datetime
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_login import login_required as flask_login_required
 from datetime import datetime as dt
 from flask import jsonify  # Asegúrate de que esta línea está en la parte superior de tu archivo
-
-
+from werkzeug.utils import secure_filename
 #funcion para asignar permiso de acceso a rol
 def redirect_based_on_role(user):
     if user.rol_id_rol == 'cliente':
@@ -418,11 +418,25 @@ def perfil_user():
 
 
 #-----------------productos - vista ADMIN------------------
+# Configuración para subir archivos
+UPLOAD_FOLDER = 'static/uploads/'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Crear el directorio de subida si no existe
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # Ruta para mostrar la página de registro de productos
 @app.route('/regproducto')
 @login_required
 def reg_producto():
-    return render_template('RegProducto.html')
+    productos = Producto.query.all()
+    categorias = CategoriaProducto.query.all()
+    return render_template('RegProducto.html', productos=productos, categorias=categorias)
 
 # Ruta para mostrar la página de categorías de productos
 @app.route('/categoriaProducto')
@@ -450,6 +464,48 @@ def add_categoria_producto():
         flash('Error al registrar la categoría: ' + str(e), 'error')
     
     return redirect(url_for('categoria_producto'))
+
+# Ruta para agregar un nuevo producto
+@app.route('/add_producto', methods=['POST'])
+@login_required
+def add_producto():
+    nombre = request.form.get('nombre')
+    descripcion = request.form.get('descripcion')
+    precio = request.form.get('precio')
+    max_personas = request.form.get('max_personas')
+    categoria_id = request.form.get('categoria')
+    imagen = request.files.get('imagen')
+
+    if not nombre or not descripcion or not precio or not max_personas or not categoria_id or not imagen:
+        flash('Todos los campos son obligatorios.', 'error')
+        return redirect(url_for('reg_producto'))
+
+    if not allowed_file(imagen.filename):
+        flash('Solo se permiten archivos de imagen con extensión .png, .jpg, .jpeg.', 'error')
+        return redirect(url_for('reg_producto'))
+
+    # Guardar la imagen
+    filename = secure_filename(imagen.filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    imagen.save(filepath)
+
+    nuevo_producto = Producto(
+        nombre=nombre,
+        descripcion=descripcion,
+        precio=float(precio),
+        max_personas=int(max_personas),
+        imagen=filepath,
+        categoria_producto_id_catProducto=int(categoria_id)
+    )
+    try:
+        db.session.add(nuevo_producto)
+        db.session.commit()
+        flash('Producto registrado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al registrar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('reg_producto'))
 #-----------------------------------------------------------------
 
 
