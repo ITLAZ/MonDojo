@@ -72,6 +72,7 @@ class Pedido(db.Model):
     fecha_hora = db.Column(db.DateTime, nullable=False)
     usuario_id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'), nullable=False)
     mesa_id_mesa = db.Column(db.Integer, db.ForeignKey('mesa.id_mesa'), nullable=False)
+    imagen = db.Column(db.String(250), nullable=True)  # Nuevo campo para la ruta de la imagen
 
 class Producto(db.Model):
     __tablename__ = 'producto'
