@@ -56,6 +56,7 @@ class Juego(db.Model):
     precio_alquiler = db.Column(db.Float, nullable=False)
     precio_venta = db.Column(db.Float, nullable=False)
     disponible_venta = db.Column(db.Boolean, nullable=False)
+    imagen = db.Column(db.String(255), nullable=False)  
     categoria_juego_id_catJuego = db.Column(db.Integer, db.ForeignKey('categoria_juego.id_catJuego'), nullable=False)
 
 class Mesa(db.Model):
@@ -80,6 +81,7 @@ class Producto(db.Model):
     descripcion = db.Column(db.String(500), nullable=False)
     precio = db.Column(db.Float, nullable=False)
     max_personas = db.Column(db.Integer, nullable=False)
+    imagen = db.Column(db.String(255), nullable=False)  
     categoria_producto_id_catProducto = db.Column(db.Integer, db.ForeignKey('categoria_producto.id_catProducto'), nullable=False)
 
 class RegistroJuego(db.Model):

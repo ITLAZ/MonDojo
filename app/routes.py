@@ -1,3 +1,4 @@
+import os
 from flask import render_template, redirect, url_for, request, flash,session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -6,12 +7,13 @@ from .models import Usuario, RegistroActividad
 from sqlalchemy.exc import SQLAlchemyError
 from flask import redirect, url_for, flash
 from flask_dance.contrib.google import google
-from .models import Usuario
+from .models import Usuario, CategoriaProducto, Producto
 import datetime
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_login import login_required as flask_login_required
 from datetime import datetime as dt
-
+from flask import jsonify  # Asegúrate de que esta línea está en la parte superior de tu archivo
+from werkzeug.utils import secure_filename
 #funcion para asignar permiso de acceso a rol
 def redirect_based_on_role(user):
     if user.rol_id_rol == 'cliente':
@@ -284,32 +286,227 @@ def new_password():
 
 
 
-# ver tabla usuarios 
+# ver tabla usuarios, busqueda y filtrados
 @app.route('/userspanel', methods=['GET'])
 @login_required
 def list_users():
-    # Filtrar usuarios por el atributo rol_id_rol con valor "usuario"
-    users = Usuario.query.filter_by(rol_id_rol='cliente').with_entities(Usuario.id_usuario, Usuario.nombre, Usuario.correo, Usuario.telefono).all()
-    return render_template('userspanel.html', users=users)
+    search_query = request.args.get('search', '').strip()
+    sort_by = request.args.get('sort_by', 'nombre')
+    sort_order = request.args.get('sort_order', 'asc')
 
+    query = Usuario.query.filter(Usuario.rol_id_rol == 'cliente')
 
-#busqueda de usuario
-@app.route('/SearchUsuario')
-@login_required
-def usuarios():
-    search_query = request.args.get('search', '')
     if search_query:
-        users = Usuario.query.filter(Usuario.nombre.ilike(f"{search_query}%")).all()
-    else:
-        users = Usuario.query.all() 
+        query = query.filter(Usuario.nombre.ilike(f"{search_query}%"))
+    
+    if sort_by and sort_order:
+        if sort_order == 'asc':
+            query = query.order_by(getattr(Usuario, sort_by).asc())
+        else:
+            query = query.order_by(getattr(Usuario, sort_by).desc())
+    
+    users = query.with_entities(Usuario.id_usuario, Usuario.nombre, Usuario.correo, Usuario.telefono).all()
+
     return render_template('userspanel.html', users=users)
 
 
+# Actualizar la información de un usuario - vista ADMIN
+@app.route('/update_user/<int:user_id>', methods=['POST'])
+@login_required
+def update_user(user_id):
+    user = Usuario.query.get_or_404(user_id)  
+
+    new_name = request.form.get('name')
+    new_email = request.form.get('email')
+    new_phone = request.form.get('phone')
+    
+    print("Datos recibidos:", new_name, new_email, new_phone)  # Depurar
+
+    if not new_name or not new_email:
+        flash('Nombre y correo son campos obligatorios.', 'error')
+        return redirect(url_for('edit_user', user_id=user_id))
+    
+    if new_phone and not new_phone.isdigit():
+        flash('El teléfono debe ser numérico.', 'error')
+        return redirect(url_for('edit_user', user_id=user_id))
+    
+    user.nombre = new_name
+    user.correo = new_email
+    user.telefono = int(new_phone) if new_phone else None
+
+    try:
+        db.session.commit()
+        flash('Usuario actualizado exitosamente.', 'success')
+        print("Usuario actualizado en la base de datos")  # Depurar
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al actualizar el usuario: ' + str(e), 'error')
+        print("Error al actualizar el usuario:", str(e))  # Depurar
+        return redirect(url_for('edit_user', user_id=user_id))
+    
+    return redirect(url_for('list_users'))
+
+#mostrar datos del usuario en editar usuario - vista ADMIN
+@app.route('/get_user/<int:user_id>')
+def get_user(user_id):
+    user = Usuario.query.get(user_id)
+    if user:
+        return jsonify({
+            "nombre": user.nombre,
+            "correo": user.correo,
+            "telefono": user.telefono
+        })
+    else:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+#ver y editar datos del ADMIN
+@app.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    user = Usuario.query.get(current_user.id_usuario)
+    if user:
+        try:
+            user.nombre = request.form['name']
+            user.correo = request.form['email']
+            user.telefono = request.form['phone']
+            db.session.commit()
+            flash('Perfil actualizado correctamente.', 'success')
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash('Error al actualizar el perfil.', 'error')
+            app.logger.error(f'Error de base de datos: {str(e)}')
+        return redirect(url_for('perfil_admin'))
+    else:
+        flash('Usuario no encontrado.', 'error')
+        return redirect(url_for('login'))
+    
+
+#ver perfil - ADMIN 
+@app.route('/perfil_admin')
+@login_required
+def perfil_admin():
+    return render_template('perfil_admin.html')
+
+#ver y editar datos de usuario - vista USER
+@app.route('/update_profileUser', methods=['POST'])
+@login_required
+def update_profileUser():
+    user = Usuario.query.get(current_user.id_usuario)
+    if user:
+        try:
+            user.nombre = request.form['name']
+            user.correo = request.form['email']
+            user.telefono = request.form['phone']
+            db.session.commit()
+            flash('Perfil actualizado correctamente.', 'success')
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash('Error al actualizar el perfil.', 'error')
+            app.logger.error(f'Error de base de datos: {str(e)}')
+        return redirect(url_for('perfil_user'))
+    else:
+        flash('Usuario no encontrado.', 'error')
+        return redirect(url_for('login'))
+    
+
+#ver perfil - vista USER
+@app.route('/perfil_user')
+@login_required
+def perfil_user():
+    return render_template('perfil_usuario.html')
 
 
+#-----------------productos - vista ADMIN------------------
+# Configuración para subir archivos
+UPLOAD_FOLDER = 'static/uploads/'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Crear el directorio de subida si no existe
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Ruta para mostrar la página de registro de productos
+@app.route('/regproducto')
+@login_required
+def reg_producto():
+    productos = Producto.query.all()
+    categorias = CategoriaProducto.query.all()
+    return render_template('RegProducto.html', productos=productos, categorias=categorias)
+
+# Ruta para mostrar la página de categorías de productos
+@app.route('/categoriaProducto')
+@login_required
+def categoria_producto():
+    categorias = CategoriaProducto.query.all()
+    return render_template('categoriaProducto.html', categorias=categorias)
+
+# Ruta para agregar una nueva categoría de producto
+@app.route('/add_categoria_producto', methods=['POST'])
+@login_required
+def add_categoria_producto():
+    nombre = request.form.get('nombre')
+    if not nombre:
+        flash('El nombre de la categoría es obligatorio.', 'error')
+        return redirect(url_for('categoria_producto'))
+
+    nueva_categoria = CategoriaProducto(nombre=nombre)
+    try:
+        db.session.add(nueva_categoria)
+        db.session.commit()
+        flash('Categoría registrada exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al registrar la categoría: ' + str(e), 'error')
+    
+    return redirect(url_for('categoria_producto'))
+
+# Ruta para agregar un nuevo producto
+@app.route('/add_producto', methods=['POST'])
+@login_required
+def add_producto():
+    nombre = request.form.get('nombre')
+    descripcion = request.form.get('descripcion')
+    precio = request.form.get('precio')
+    max_personas = request.form.get('max_personas')
+    categoria_id = request.form.get('categoria')
+    imagen = request.files.get('imagen')
+
+    if not nombre or not descripcion or not precio or not max_personas or not categoria_id or not imagen:
+        flash('Todos los campos son obligatorios.', 'error')
+        return redirect(url_for('reg_producto'))
+
+    if not allowed_file(imagen.filename):
+        flash('Solo se permiten archivos de imagen con extensión .png, .jpg, .jpeg.', 'error')
+        return redirect(url_for('reg_producto'))
+
+    # Guardar la imagen
+    filename = secure_filename(imagen.filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    imagen.save(filepath)
+
+    nuevo_producto = Producto(
+        nombre=nombre,
+        descripcion=descripcion,
+        precio=float(precio),
+        max_personas=int(max_personas),
+        imagen=filepath,
+        categoria_producto_id_catProducto=int(categoria_id)
+    )
+    try:
+        db.session.add(nuevo_producto)
+        db.session.commit()
+        flash('Producto registrado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al registrar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('reg_producto'))
+#-----------------------------------------------------------------
 
 
 
@@ -324,9 +521,10 @@ def usuarios():
 
 
 # proteger rutas - utilizado para proteger rutas que requieren login y autenticacion del usuario
+#decorador
 def login_required(f):
     @wraps(f)
-    @flask_login_required  # Asegurarse que Flask-Login maneje primero la autenticación
+    @flask_login_required  
     
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:

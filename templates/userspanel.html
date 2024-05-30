@@ -29,36 +29,31 @@
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
         <ul class="nav-items">
-            <li><a href="adminpanel.html">Inicio</a></li>
-            <li><a href="userspanel.html">Usuarios</a></li>
+            <li><a href="/adminpanel">Inicio</a></li>
+            <li><a href="/usuarios">Usuarios</a></li>
             <li><a href="/juegos">Juegos</a></li>
             <li><a href="/comida">Comida</a></li>
             <li><a href="/mesas">Mesas</a></li>
             <li><a href="/reservas">Reservas</a></li>
             <li><a href="/pedidos">Pedidos</a></li>
-            <li><a href="/empleados">Empleados</a></li>
-            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li>
+            <li><a href="/logout">Cerrar Sesion</a></li>
         </ul>
     </nav>
     <div class="container">
         <div class="actions-container">
-            <form method="GET" action="/SearchUsuario">
+            <form method="GET" action="/userspanel">
                 <div class="search-container">
-                    <input type="text" name="search" placeholder="Buscar usuario">
+                    <input type="text" name="search" placeholder="Buscar usuario" value="{{ request.args.get('search', '') }}">
                     <button type="submit">Buscar <i class="fa-solid fa-search"></i></button>
                 </div>
             </form>
-
-            <div class="add-user">
-                <button id="addUserBtn"><i class="fa-solid fa-user-plus"></i> Añadir Usuario</button>
-            </div>
         </div>
         <table>
             <thead>
                 <tr>
-                    <th>Nombre <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                    <th>Correo Electrónico <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                    <th>Teléfono <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                    <th>Nombre <a href="{{ url_for('list_users', search=request.args.get('search', ''), sort_by='nombre', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'nombre') == 'nombre' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                    <th>Correo Electrónico <a href="{{ url_for('list_users', search=request.args.get('search', ''), sort_by='correo', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'correo') == 'correo' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                    <th>Teléfono <a href="{{ url_for('list_users', search=request.args.get('search', ''), sort_by='telefono', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'telefono') == 'telefono' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -69,68 +64,13 @@
                     <td>{{ user.correo }}</td>
                     <td>{{ user.telefono }}</td>
                     <td>
-                        <button class="editUserBtn"><i class="fa-solid fa-edit"></i></button>
+                        <button class="editUserBtn" data-user-id="{{ user.id_usuario }}"><i class="fa-solid fa-edit"></i></button>
                         <button class="deleteUserBtn" onclick="confirmDelete(event)"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-
-    <!-- REGISTRAR NUEVO USUARIO POP-UP -->
-    <div class="popup" id="contactPopup">
-        <div class="popup-content">
-            <span class="close-btn" onclick="closePopup()">&times;</span>
-            <img src="../static/images/agregar_usuario.png" alt="User Icon" class="user-icon">
-            <h2>REGISTRO NUEVO USUARIO</h2>
-            <div class="step-indicator">
-                <div class="step-container">
-                    <span class="step" onclick="showTab(0)" id="step1">1</span>
-                    <span class="step-line"></span>
-                    <span class="step" onclick="showTab(1)" id="step2">2</span>
-                    <span class="step-line"></span>
-                    <span class="step" onclick="showTab(2)" id="step3">3</span>
-                </div>
-            </div>
-            <form id="regForm" onsubmit="showSuccessMessage(event, 'contactPopup', 'regForm', 'Datos registrados con éxito')">
-                <div class="tab">
-                    <div class="form-group">
-                        <label for="name">Nombre</label>
-                        <input type="text" id="name" name="name" required>
-                        <span class="error-message" id="error-name"></span>
-                    </div> 
-                    <div class="form-group">
-                        <label for="email">Correo</label>
-                        <input type="email" id="email" name="email" required>
-                        <span class="error-message" id="error-email"></span>
-                    </div>  
-                </div>
-                <div class="tab"> 
-                    <div class="form-group">
-                        <label for="phone">Teléfono</label>
-                        <input type="text" id="phone" name="phone" required>
-                        <span class="error-message" id="error-phone"></span>
-                    </div>
-                </div>
-                <div class="tab">
-                    <div class="form-group">
-                        <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password" required>
-                        <span class="error-message" id="error-password"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm-password">Verificar Contraseña</label>
-                        <input type="password" id="confirm-password" name="confirm-password" required>
-                        <span class="error-message" id="error-confirm-password"></span>
-                    </div>
-                    <div class="buttons">
-                        <button type="submit">Guardar</button>
-                        <button type="button" onclick="confirmCancel('regForm')">Cancelar</button>
-                    </div>
-                </div>
-            </form>
-        </div>
     </div>
 
     <!-- EDITAR USUARIO POP-UP -->
@@ -148,7 +88,7 @@
                     <span class="step" onclick="showEditTab(2)" id="editStep3">3</span>
                 </div>
             </div>
-            <form id="editForm" onsubmit="showSuccessMessage(event, 'editPopup', 'editForm', 'Cambios guardados con éxito')">
+            <form id="editForm" method="POST"onsubmit="handleSubmit(event)">
                 <div class="tab">
                     <div class="form-group">
                         <label for="editName">Nombre</label>
@@ -180,40 +120,22 @@
 
     <!-- SCRIPT POP-UP -->
     <script>
-        let currentTab = 0;
-        showTab(currentTab);
-
-        document.getElementById('addUserBtn').addEventListener('click', function() {
-            document.getElementById('contactPopup').style.display = 'block';
-        });
-
-        document.querySelectorAll('.editUserBtn').forEach(function(button) {
+        document.querySelectorAll('.editUserBtn').forEach(button => {
             button.addEventListener('click', function() {
-                document.getElementById('editPopup').style.display = 'block';
-                showEditTab(0);
+                const userId = button.getAttribute('data-user-id');
+                fetch(`/get_user/${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('editName').value = data.nombre;
+                        document.getElementById('editEmail').value = data.correo;
+                        document.getElementById('editPhone').value = data.telefono;
+                        document.getElementById('editForm').action = `/update_user/${userId}`;
+                        document.getElementById('editPopup').style.display = 'block';
+                        showEditTab(0);
+                    })
+                    .catch(error => console.error('Error loading the user data:', error));
             });
         });
-
-        function showTab(n) {
-            let tabs = document.getElementById("regForm").getElementsByClassName("tab");
-            for (let i = 0; i < tabs.length; i++) {
-                tabs[i].style.display = "none";
-            }
-            tabs[n].style.display = "block";
-
-            let steps = document.getElementById("contactPopup").getElementsByClassName("step");
-            let lines = document.getElementById("contactPopup").getElementsByClassName("step-line");
-            for (let i = 0; i < steps.length; i++) {
-                steps[i].className = steps[i].className.replace(" active", "");
-                if (i < lines.length) {
-                    lines[i].className = lines[i].className.replace(" active", "");
-                }
-            }
-            steps[n].className += " active";
-            for (let i = 0; i < n; i++) {
-                lines[i].className += " active";
-            }
-        }
 
         function showEditTab(n) {
             let tabs = document.getElementById("editForm").getElementsByClassName("tab");
@@ -236,16 +158,8 @@
             }
         }
 
-        function closePopup() {
-            document.getElementById('contactPopup').style.display = 'none';
-        }
-
         function closeEditPopup() {
             document.getElementById('editPopup').style.display = 'none';
-        }
-
-        function clearForm() {
-            document.getElementById("regForm").reset();
         }
 
         function clearEditForm() {
@@ -253,7 +167,7 @@
         }
 
         function confirmCancel(formType) {
-            let confirmMessage = formType === 'regForm' ? '¿Está seguro de cancelar? Se perderán los datos.' : '¿Está seguro de cancelar? Se perderán sus cambios.';
+            let confirmMessage = '¿Está seguro de cancelar? Se perderán sus cambios.';
             Swal.fire({
                 title: '¿Está seguro?',
                 text: confirmMessage,
@@ -267,16 +181,39 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    if (formType === 'regForm') {
-                        closePopup();
-                        clearForm();
-                    } else {
-                        closeEditPopup();
-                        clearEditForm();
-                    }
+                    closeEditPopup();
+                    clearEditForm();
                 }
             });
         }
+        function handleSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            fetch(form.action, {
+                method: form.method,
+                body: new FormData(form)
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSuccessMessage(event, 'editPopup', 'editForm', 'Cambios guardados con éxito');
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                console.error('Error al guardar los cambios:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Hubo un problema al guardar los cambios.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'swal2-confirm'
+                    }
+                });
+            });
+        }
+
 
         function showSuccessMessage(event, popupId, formId, message) {
             event.preventDefault();
@@ -291,6 +228,8 @@
             }).then(() => {
                 document.getElementById(popupId).style.display = 'none';
                 document.getElementById(formId).reset();
+                window.location.href = "/userspanel";  // Redirigir al panel de usuarios para ver los cambios
+
             });
         }
 

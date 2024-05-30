@@ -19,7 +19,7 @@
     </nav>
     <div class="container">
         <div class="form-container">
-            <form id="registration-form" action="/register" method="POST">
+            <form id="registration-form" action="/update_profile" method="POST">
                 <h3>Perfil de administrador</h3>
                 <div class="profile-photo-container">
                     <img src="../static/images/logo.png" alt="Foto de usuario" class="profile-photo">
@@ -28,7 +28,7 @@
                 <div class="input-container">
                     <label for="name">Nombre</label>
                     <div class="input-with-icon">
-                        <input type="text" id="name" name="name" required>
+                        <input type="text" id="name" name="name" value="{{ current_user.nombre }}" required>
                         <i class="fas fa-edit"></i>
                         <span class="error-message" id="error-name"></span>
                     </div>
@@ -36,7 +36,7 @@
                 <div class="input-container">
                     <label for="email">Correo Electrónico</label>
                     <div class="input-with-icon">
-                        <input type="text" id="email" name="email" required>
+                        <input type="email" id="email" name="email" value="{{ current_user.correo }}" required>
                         <span class="error-message" id="error-email"></span>
                         <i class="fas fa-edit"></i>
                     </div>
@@ -44,7 +44,7 @@
                 <div class="input-container">
                     <label for="phone">Teléfono</label>
                     <div class="input-with-icon">
-                        <input type="phone" id="phone" name="phone" required>
+                        <input type="text" id="phone" name="phone" value="{{ current_user.telefono }}" required>
                         <span class="error-message" id="error-phone"></span>
                         <i class="fas fa-edit"></i>
                     </div>
@@ -52,12 +52,12 @@
                 <div class="input-container">
                     <label for="password">Restablecer Contraseña</label>
                     <div class="input-with-icon change-password-container">
-                        <button type="button" class="btn change-password-btn" onclick="window.location.href='/templates/cambiar_contrasena.html'">🔏ㅤㅤ </button>
+                        <button type="button" class="btn change-password-btn" onclick="window.location.href='/reset_password'">🔏ㅤㅤ </button>
                     </div>
                 </div>
                 <div class="button-container">
                     <button type="submit" class="btn">Guardar cambios</button>
-                    <button type="button" class="btn" onclick="window.location.href='/templates/inicio_usuario.html'">Cancelar</button>
+                    <button type="button" class="btn" onclick="window.location.href='/adminpanel'">Cancelar</button>
                 </div>
             </form>
         </div>
