@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Monster Dojo - Panel de Productos/Comida</title>
+    <title>Monster Dojo - Panel de Juegos</title>
     <!-- Link css -->
     <link rel="stylesheet" href="../static/css/food-panel.css">
     <link rel="stylesheet" href="../static/css/popup_panel.css">
@@ -10,7 +10,7 @@
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Estilos para las alertas -->
+    <!-- Estilos para las alertas y extras -->
     <style>
         .swal2-cancel {
             background-color: #192847 !important;
@@ -57,10 +57,10 @@
 
         .add-buttons {
             display: flex;
-            gap: 20px; /* Espacio entre los botones de agregar producto y categoría */
+            gap: 20px; 
         }
 
-        .add-product button,
+        .add-game button,
         .add-category button {
             width: auto;
             background-color: var(--alt-primary-color);
@@ -73,6 +73,48 @@
             margin-left: 10px;
             margin-right: 10px;
         }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            margin-right: 10px;
+        }
+
+        .custom-checkbox {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #1c1c1c;
+            border: 2px solid #d48600;
+            border-radius: 5px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .custom-checkbox input {
+            display: none;
+        }
+
+        .custom-checkbox input:checked + .checkmark::after {
+            content: '✔';
+            color: #d48600;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+        }
+
+        .checkmark {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -83,7 +125,7 @@
         <ul class="nav-items">
             <li><a href="adminpanel.html">Inicio</a></li>
             <li><a href="userspanel.html">Usuarios</a></li>
-            <li><a href="/juegos">Juegos</a></li>
+            <li><a href="games-panel.html">Juegos</a></li>
             <li><a href="food-panel.html">Comida</a></li>
             <li><a href="/mesas">Mesas</a></li>
             <li><a href="/reservas">Reservas</a></li>
@@ -94,15 +136,15 @@
     </nav>
     <div class="container">
         <div class="actions-container">
-            <form method="GET" action="/SearchUsuario">
+            <form method="GET" action="/SearchJuego">
                 <div class="search-container">
-                    <input type="text" name="search" placeholder="Buscar producto">
+                    <input type="text" name="search" placeholder="Buscar juego">
                     <button type="submit">Buscar <i class="fa-solid fa-search"></i></button>
                 </div>
             </form>
 
             <div class="add-buttons">
-                <button id="addProductBtn"><i class="fa-solid fa-burger"></i> Agregar Producto</button>
+                <button id="addGameBtn"><i class="fa-solid fa-dice"></i> Agregar Juego</button>
                 <button id="addCategoryBtn"><i class="fa-solid fa-list"></i> Agregar Categoría</button>
             </div>
         </div>
@@ -113,27 +155,29 @@
                         <th>ID <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
                         <th>Nombre <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
                         <th>Descripción <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Precio <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Máx. Personas <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Precio Alquiler <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Precio Venta <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Disponible Venta<button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
                         <th>Imagen <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
                         <th>Categoría <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for producto in productos %}
+                    {% for juego in juegos %}
                     <tr>
-                        <td>{{ producto.id_producto }}</td>
-                        <td>{{ producto.nombre }}</td>
-                        <td>{{ producto.descripcion }}</td>
-                        <td>{{ producto.precio }}</td>
-                        <td>{{ producto.max_personas }}</td>
-                        <td><img src="{{ producto.imagen }}" alt="Imagen de {{ producto.nombre }}" width="100"></td>
-                        <td>{{ producto.categoria_producto.nombre }}</td>
+                        <td>{{ juego.id_juego }}</td>
+                        <td>{{ juego.nombre }}</td>
+                        <td>{{ juego.descripcion }}</td>
+                        <td>{{ juego.precio_alquiler }}</td>
+                        <td>{{ juego.precio_venta }}</td>
+                        <td>{{ juego.disponible_venta }}</td>
+                        <td><img src="{{ juego.imagen }}" alt="Imagen de {{ juego.nombre }}" width="100"></td>
+                        <td>{{ juego.categoria_juego.nombre }}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="editProductBtn" data-id="{{ producto.id_producto }}"><i class="fa-solid fa-edit"></i></button>
-                                <button class="deleteProductBtn" onclick="confirmDelete(event)"><i class="fa-solid fa-trash"></i></button>
+                                <button class="editGameBtn" data-id="{{ juego.id_juego }}"><i class="fa-solid fa-edit"></i></button>
+                                <button class="deleteGameBtn" onclick="confirmDelete(event)"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>                        
                     </tr>
@@ -143,12 +187,12 @@
         </div>
     </div>
 
-    <!-- REGISTRAR NUEVO PRODUCTO POP-UP -->
+    <!-- REGISTRAR NUEVO JUEGO POP-UP -->
     <div class="popup" id="contactPopup">
         <div class="popup-content">
             <span class="close-btn" onclick="closePopup()">&times;</span>
-            <img src="../static/images/menu.png" alt="Product Icon" class="product-icon">
-            <h2>REGISTRO NUEVO PRODUCTO</h2>
+            <img src="../static/images/espadas.png" alt="Game Icon" class="product-icon">
+            <h2>REGISTRO NUEVO JUEGO</h2>
             <div class="step-indicator">
                 <div class="step-container">
                     <span class="step" onclick="showTab(0)" id="step1">1</span>
@@ -166,28 +210,31 @@
                         <span class="error-message" id="error-nombre"></span>
                     </div> 
                     <div class="form-group">
-                        <label for="email">Correo</label>
-                        <input type="email" id="email" name="email" required>
-                        <span class="error-message" id="error-email"></span>
-                    </div>  
-                </div>
-                <div class="tab"> 
-                    <div class="form-group">
                         <label for="descripcion">Descripción</label>
                         <input type="text" id="descripcion" name="descripcion" required>
                         <span class="error-message" id="error-descripcion"></span>
                     </div>
+                </div>
+                <div class="tab"> 
                     <div class="form-group">
-                        <label for="precio">Precio</label>
-                        <input type="number" id="precio" name="precio" step="0.01" required>
-                        <span class="error-message" id="error-precio"></span>
+                        <label for="precio_alquiler">Precio Alquiler</label>
+                        <input type="number" id="precio_alquiler" name="precio_alquiler" step="0.01" required>
+                        <span class="error-message" id="error-precio_alquiler"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="precio_venta">Precio Venta</label>
+                        <input type="number" id="precio_venta" name="precio_venta" step="0.01" required>
+                        <span class="error-message" id="error-precio_venta"></span>
                     </div>
                 </div>
                 <div class="tab">
                     <div class="form-group">
-                        <label for="max_personas">Máx. Personas</label>
-                        <input type="number" id="max_personas" name="max_personas" required>
-                        <span class="error-message" id="error-max_personas"></span>
+                        <label for="disponible_venta">Disponible Venta</label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="disponible_venta" name="disponible_venta" required>
+                            <span class="checkmark"></span>
+                        </label>
+                        <span class="error-message" id="error-disponible_venta"></span>
                     </div>
                     <div class="form-group">
                         <label for="imagen">Imagen</label>
@@ -198,7 +245,7 @@
                         <label for="categoria">Categoría</label>
                         <select id="categoria" name="categoria" required>
                             {% for categoria in categorias %}
-                            <option value="{{ categoria.id_catProducto }}">{{ categoria.nombre }}</option>
+                            <option value="{{ categoria.id_catJuego }}">{{ categoria.nombre }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -211,12 +258,12 @@
         </div>
     </div>
 
-    <!-- EDITAR PRODUCTO (COMIDA) POP-UP -->
+    <!-- EDITAR JUEGO POP-UP -->
     <div class="popup" id="editPopup">
         <div class="popup-content">
             <span class="close-btn" onclick="closeEditPopup()">&times;</span>
-            <img src="../static/images/hamburguer.png" alt="Product Icon" class="product-icon">
-            <h2>EDITAR PRODUCTO</h2>
+            <img src="../static/images/dados.png" alt="Game Icon" class="product-icon">
+            <h2>EDITAR JUEGO</h2>
             <div class="step-indicator">
                 <div class="step-container">
                     <span class="step" onclick="showEditTab(0)" id="step1">1</span>
@@ -234,28 +281,31 @@
                         <span class="error-message" id="edit-error-nombre"></span>
                     </div> 
                     <div class="form-group">
-                        <label for="edit_email">Correo</label>
-                        <input type="email" id="edit_email" name="email" required>
-                        <span class="error-message" id="edit-error-email"></span>
-                    </div>  
-                </div>
-                <div class="tab"> 
-                    <div class="form-group">
                         <label for="edit_descripcion">Descripción</label>
                         <input type="text" id="edit_descripcion" name="descripcion" required>
                         <span class="error-message" id="edit-error-descripcion"></span>
                     </div>
+                </div>
+                <div class="tab"> 
                     <div class="form-group">
-                        <label for="edit_precio">Precio</label>
-                        <input type="number" id="edit_precio" name="precio" step="0.01" required>
-                        <span class="error-message" id="edit-error-precio"></span>
+                        <label for="edit_precio_alquiler">Precio Alquiler</label>
+                        <input type="number" id="edit_precio_alquiler" name="precio_alquiler" step="0.01" required>
+                        <span class="error-message" id="edit-error-precio_alquiler"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_precio_venta">Precio Venta</label>
+                        <input type="number" id="edit_precio_venta" name="precio_venta" step="0.01" required>
+                        <span class="error-message" id="edit-error-precio_venta"></span>
                     </div>
                 </div>
                 <div class="tab">
                     <div class="form-group">
-                        <label for="edit_max_personas">Máx. Personas</label>
-                        <input type="number" id="edit_max_personas" name="max_personas" required>
-                        <span class="error-message" id="edit-error-max_personas"></span>
+                        <label for="edit_disponible_venta">Disponible Venta</label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="edit_disponible_venta" name="disponible_venta" required>
+                            <span class="checkmark"></span>
+                        </label>
+                        <span class="error-message" id="edit-error-disponible_venta"></span>
                     </div>
                     <div class="form-group">
                         <label for="edit_imagen">Imagen</label>
@@ -266,7 +316,7 @@
                         <label for="edit_categoria">Categoría</label>
                         <select id="edit_categoria" name="categoria" required>
                             {% for categoria in categorias %}
-                            <option value="{{ categoria.id_catProducto }}">{{ categoria.nombre }}</option>
+                            <option value="{{ categoria.id_catJuego }}">{{ categoria.nombre }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -304,7 +354,7 @@
         let currentTab = 0;
         showTab(currentTab);
 
-        document.getElementById('addProductBtn').addEventListener('click', function() {
+        document.getElementById('addGameBtn').addEventListener('click', function() {
             document.getElementById('contactPopup').style.display = 'block';
         });
 
@@ -312,7 +362,7 @@
             document.getElementById('categoryPopup').style.display = 'block';
         });
 
-        document.querySelectorAll('.editProductBtn').forEach(function(button) {
+        document.querySelectorAll('.editGameBtn').forEach(function(button) {
             button.addEventListener('click', function() {
                 document.getElementById('editPopup').style.display = 'block';
                 showEditTab(0);
