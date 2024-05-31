@@ -10,48 +10,78 @@
     <div class="popup" id="shoppingCartPopup">
         <div class="popup-content">
             <span class="close-btn" onclick="closePopup()">&times;</span>
-            <h2>Shopping Cart</h2>
-            <a href="#" class="remove-all">Remove all</a>
-            <div class="cart-item">
-                <img src="../static/images/food3.jpg" alt="Apple Juice" class="item-image">
-                <div class="item-details">
-                    <h3>Pasta Fettucinne</h3>
-                    <p>Plato</p>
-                    <span class="veg-icon"></span>
-                </div>
-                <div class="item-quantity">
-                    <button class="quantity-btn">+</button>
-                    <span class="quantity">2</span>
-                    <button class="quantity-btn">-</button>
-                </div>
-                <div class="item-price">
-                    <p>15 Bs.</p>
-                    <a href="#" class="remove">Remove</a>
-                </div>
-            </div>
-            <div class="cart-item">
-                <img src="/static/images/food2.jpg" alt="Grapes Juice" class="item-image">
-                <div class="item-details">
-                    <h3>Tiramisú</h3>
-                    <p>1 porción</p>
-                    <span class="veg-icon"></span>
-                </div>
-                <div class="item-quantity">
-                    <button class="quantity-btn">+</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn">-</button>
-                </div>
-                <div class="item-price">
-                    <p>30 Bs.</p>
-                    <a href="#" class="remove">Remove</a>
-                </div>
-            </div>
+            <h2>Carrito de compras 🛒</h2>
+            <a href="#" class="remove-all">Remover todo</a>
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Quitar</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="cart-item">
+                        <td>
+                            <div class="item-details">
+                                <img src="../static/images/food3.jpg" alt="Pasta Fettucinne" class="item-image">
+                                <div class="item-info">
+                                    <h3>Pasta Fettucinne</h3>
+                                    <p>Plato</p>
+                                    <span class="veg-icon"></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="item-quantity">
+                                <button class="quantity-btn">+</button>
+                                <span class="quantity">2</span>
+                                <button class="quantity-btn">-</button>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="#" class="remove">Quitar</a>
+                        </td>
+                        <td>
+                            <p>15 Bs.</p>
+                        </td>
+                    </tr>
+                    <tr class="cart-item">
+                        <td>
+                            <div class="item-details">
+                                <img src="/static/images/food2.jpg" alt="Tiramisú" class="item-image">
+                                <div class="item-info">
+                                    <h3>Tiramisú</h3>
+                                    <p>1 porción</p>
+                                    <span class="veg-icon"></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="item-quantity">
+                                <button class="quantity-btn">+</button>
+                                <span class="quantity">1</span>
+                                <button class="quantity-btn">-</button>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="#" class="remove">Quitar</a>
+                        </td>
+                        <td>
+                            <p>30 Bs.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <div class="subtotal">
                 <p>Sub-Total</p>
-                <span class="items-count">2 items</span>
-                <span class="total-price">$6.18</span>
+                <span class="items-count">2 Productos</span>
+                <span class="total-price">45 Bs.</span>
             </div>
-            <button class="checkout-btn">Checkout</button>
+            <div class="button-container">
+                <button class="checkout-btn">Pedir</button>
+            </div>
         </div>
     </div>
 

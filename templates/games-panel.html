@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Monster Dojo - Panel de Juegos</title>
+    <!-- Link css -->
+    <link rel="stylesheet" href="../static/css/food-panel.css">
+    <link rel="stylesheet" href="../static/css/popup_panel.css">
+    <!-- Link fonts -->
+    <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Estilos para las alertas y extras -->
+    <style>
+        .swal2-cancel {
+            background-color: #192847 !important;
+            color: #fff !important;
+        }
+        .swal2-confirm {
+            background-color: #d48600 !important;
+            color: #fff !important;
+            width: 120px !important; 
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .action-buttons button {
+            background-color: var(--alt-primary-color);
+            color: var(--light-color);
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .action-buttons button i {
+            pointer-events: none;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            gap: 20px; 
+        }
+
+        .search-container button,
+        .add-buttons button {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .add-buttons {
+            display: flex;
+            gap: 20px; 
+        }
+
+        .add-game button,
+        .add-category button {
+            width: auto;
+            background-color: var(--alt-primary-color);
+            color: var(--light-color);
+            font-size: 15px;
+            border: none;
+            padding: 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            margin-right: 10px;
+        }
+
+        .custom-checkbox {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #1c1c1c;
+            border: 2px solid #d48600;
+            border-radius: 5px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .custom-checkbox input {
+            display: none;
+        }
+
+        .custom-checkbox input:checked + .checkmark::after {
+            content: '✔';
+            color: #d48600;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+        }
+
+        .checkmark {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <ul class="nav-items">
+            <li><a href="adminpanel.html">Inicio</a></li>
+            <li><a href="userspanel.html">Usuarios</a></li>
+            <li><a href="games-panel.html">Juegos</a></li>
+            <li><a href="food-panel.html">Comida</a></li>
+            <li><a href="/mesas">Mesas</a></li>
+            <li><a href="/reservas">Reservas</a></li>
+            <li><a href="/pedidos">Pedidos</a></li>
+            <li><a href="/empleados">Empleados</a></li>
+            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="actions-container">
+            <form method="GET" action="/SearchJuego">
+                <div class="search-container">
+                    <input type="text" name="search" placeholder="Buscar juego">
+                    <button type="submit">Buscar <i class="fa-solid fa-search"></i></button>
+                </div>
+            </form>
+
+            <div class="add-buttons">
+                <button id="addGameBtn"><i class="fa-solid fa-dice"></i> Agregar Juego</button>
+                <button id="addCategoryBtn"><i class="fa-solid fa-list"></i> Agregar Categoría</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Nombre <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Descripción <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Precio Alquiler <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Precio Venta <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Disponible Venta<button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Imagen <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Categoría <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for juego in juegos %}
+                    <tr>
+                        <td>{{ juego.id_juego }}</td>
+                        <td>{{ juego.nombre }}</td>
+                        <td>{{ juego.descripcion }}</td>
+                        <td>{{ juego.precio_alquiler }}</td>
+                        <td>{{ juego.precio_venta }}</td>
+                        <td>{{ juego.disponible_venta }}</td>
+                        <td><img src="{{ juego.imagen }}" alt="Imagen de {{ juego.nombre }}" width="100"></td>
+                        <td>{{ juego.categoria_juego.nombre }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="editGameBtn" data-id="{{ juego.id_juego }}"><i class="fa-solid fa-edit"></i></button>
+                                <button class="deleteGameBtn" onclick="confirmDelete(event)"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- REGISTRAR NUEVO JUEGO POP-UP -->
+    <div class="popup" id="contactPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup()">&times;</span>
+            <img src="../static/images/espadas.png" alt="Game Icon" class="product-icon">
+            <h2>REGISTRO NUEVO JUEGO</h2>
+            <div class="step-indicator">
+                <div class="step-container">
+                    <span class="step" onclick="showTab(0)" id="step1">1</span>
+                    <span class="step-line"></span>
+                    <span class="step" onclick="showTab(1)" id="step2">2</span>
+                    <span class="step-line"></span>
+                    <span class="step" onclick="showTab(2)" id="step3">3</span>
+                </div>
+            </div>
+            <form id="regForm" onsubmit="showSuccessMessage(event, 'contactPopup', 'regForm', 'Datos registrados con éxito')">
+                <div class="tab">
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                        <span class="error-message" id="error-nombre"></span>
+                    </div> 
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <input type="text" id="descripcion" name="descripcion" required>
+                        <span class="error-message" id="error-descripcion"></span>
+                    </div>
+                </div>
+                <div class="tab"> 
+                    <div class="form-group">
+                        <label for="precio_alquiler">Precio Alquiler</label>
+                        <input type="number" id="precio_alquiler" name="precio_alquiler" step="0.01" required>
+                        <span class="error-message" id="error-precio_alquiler"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="precio_venta">Precio Venta</label>
+                        <input type="number" id="precio_venta" name="precio_venta" step="0.01" required>
+                        <span class="error-message" id="error-precio_venta"></span>
+                    </div>
+                </div>
+                <div class="tab">
+                    <div class="form-group">
+                        <label for="disponible_venta">Disponible Venta</label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="disponible_venta" name="disponible_venta" required>
+                            <span class="checkmark"></span>
+                        </label>
+                        <span class="error-message" id="error-disponible_venta"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="imagen">Imagen</label>
+                        <input type="file" id="imagen" name="imagen" accept="image/png, image/jpeg, image/jpg" required>
+                        <span class="error-message" id="error-imagen"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria" name="categoria" required>
+                            {% for categoria in categorias %}
+                            <option value="{{ categoria.id_catJuego }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="buttons">
+                        <button type="submit">Registrar</button>
+                        <button type="button" onclick="confirmCancel('regForm')">Cancelar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDITAR JUEGO POP-UP -->
+    <div class="popup" id="editPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closeEditPopup()">&times;</span>
+            <img src="../static/images/dados.png" alt="Game Icon" class="product-icon">
+            <h2>EDITAR JUEGO</h2>
+            <div class="step-indicator">
+                <div class="step-container">
+                    <span class="step" onclick="showEditTab(0)" id="step1">1</span>
+                    <span class="step-line"></span>
+                    <span class="step" onclick="showEditTab(1)" id="step2">2</span>
+                    <span class="step-line"></span>
+                    <span class="step" onclick="showEditTab(2)" id="step3">3</span>
+                </div>
+            </div>
+            <form id="editForm" onsubmit="showSuccessMessage(event, 'editPopup', 'editForm', 'Datos registrados con éxito')">
+                <div class="tab">
+                    <div class="form-group">
+                        <label for="edit_nombre">Nombre</label>
+                        <input type="text" id="edit_nombre" name="nombre" required>
+                        <span class="error-message" id="edit-error-nombre"></span>
+                    </div> 
+                    <div class="form-group">
+                        <label for="edit_descripcion">Descripción</label>
+                        <input type="text" id="edit_descripcion" name="descripcion" required>
+                        <span class="error-message" id="edit-error-descripcion"></span>
+                    </div>
+                </div>
+                <div class="tab"> 
+                    <div class="form-group">
+                        <label for="edit_precio_alquiler">Precio Alquiler</label>
+                        <input type="number" id="edit_precio_alquiler" name="precio_alquiler" step="0.01" required>
+                        <span class="error-message" id="edit-error-precio_alquiler"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_precio_venta">Precio Venta</label>
+                        <input type="number" id="edit_precio_venta" name="precio_venta" step="0.01" required>
+                        <span class="error-message" id="edit-error-precio_venta"></span>
+                    </div>
+                </div>
+                <div class="tab">
+                    <div class="form-group">
+                        <label for="edit_disponible_venta">Disponible Venta</label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="edit_disponible_venta" name="disponible_venta" required>
+                            <span class="checkmark"></span>
+                        </label>
+                        <span class="error-message" id="edit-error-disponible_venta"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_imagen">Imagen</label>
+                        <input type="file" id="edit_imagen" name="imagen" accept="image/png, image/jpeg, image/jpg" required>
+                        <span class="error-message" id="edit-error-imagen"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_categoria">Categoría</label>
+                        <select id="edit_categoria" name="categoria" required>
+                            {% for categoria in categorias %}
+                            <option value="{{ categoria.id_catJuego }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="buttons">
+                        <button type="submit">Guardar Cambios</button>
+                        <button type="button" onclick="confirmCancel('editForm')">Cancelar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AGREGAR CATEGORÍA POP-UP -->
+    <div class="popup" id="categoryPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closeCategoryPopup()">&times;</span>
+            <img src="../static/images/category.png" alt="Category Icon" class="product-icon">
+            <h2>REGISTRO NUEVA CATEGORÍA</h2>
+            <form id="categoryForm" onsubmit="showSuccessMessage(event, 'categoryPopup', 'categoryForm', 'Categoría registrada con éxito')">
+                <div class="form-group">
+                    <label for="categoria_nombre">Nombre de la categoría</label>
+                    <input type="text" id="categoria_nombre" name="nombre" required>
+                    <span class="error-message" id="error-categoria_nombre"></span>
+                </div>
+                <div class="buttons">
+                    <button type="submit">Registrar</button>
+                    <button type="button" onclick="confirmCancel('categoryForm')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT POP-UP -->
+    <script>
+        let currentTab = 0;
+        showTab(currentTab);
+
+        document.getElementById('addGameBtn').addEventListener('click', function() {
+            document.getElementById('contactPopup').style.display = 'block';
+        });
+
+        document.getElementById('addCategoryBtn').addEventListener('click', function() {
+            document.getElementById('categoryPopup').style.display = 'block';
+        });
+
+        document.querySelectorAll('.editGameBtn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                document.getElementById('editPopup').style.display = 'block';
+                showEditTab(0);
+            });
+        });
+
+        function showTab(n) {
+            let tabs = document.getElementById("regForm").getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].style.display = "none";
+            }
+            tabs[n].style.display = "block";
+
+            let steps = document.getElementById("contactPopup").getElementsByClassName("step");
+            let lines = document.getElementById("contactPopup").getElementsByClassName("step-line");
+            for (let i = 0; i < steps.length; i++) {
+                steps[i].className = steps[i].className.replace(" active", "");
+                if (i < lines.length) {
+                    lines[i].className = lines[i].className.replace(" active", "");
+                }
+            }
+            steps[n].className += " active";
+            for (let i = 0; i < n; i++) {
+                lines[i].className += " active";
+            }
+        }
+
+        function showEditTab(n) {
+            let tabs = document.getElementById("editForm").getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].style.display = "none";
+            }
+            tabs[n].style.display = "block";
+
+            let steps = document.getElementById("editPopup").getElementsByClassName("step");
+            let lines = document.getElementById("editPopup").getElementsByClassName("step-line");
+            for (let i = 0; i < steps.length; i++) {
+                steps[i].className = steps[i].className.replace(" active", "");
+                if (i < lines.length) {
+                    lines[i].className = lines[i].className.replace(" active", "");
+                }
+            }
+            steps[n].className += " active";
+            for (let i = 0; i < n; i++) {
+                lines[i].className += " active";
+            }
+        }
+
+        function closePopup() {
+            document.getElementById('contactPopup').style.display = 'none';
+        }
+
+        function closeEditPopup() {
+            document.getElementById('editPopup').style.display = 'none';
+        }
+
+        function closeCategoryPopup() {
+            document.getElementById('categoryPopup').style.display = 'none';
+        }
+
+        function clearForm() {
+            document.getElementById("regForm").reset();
+        }
+
+        function clearEditForm() {
+            document.getElementById("editForm").reset();
+        }
+
+        function clearCategoryForm() {
+            document.getElementById("categoryForm").reset();
+        }
+
+        function confirmCancel(formType) {
+            let confirmMessage;
+            if (formType === 'regForm') {
+                confirmMessage = '¿Está seguro de cancelar? Se perderán los datos.';
+            } else if (formType === 'editForm') {
+                confirmMessage = '¿Está seguro de cancelar? Se perderán sus cambios.';
+            } else {
+                confirmMessage = '¿Está seguro de cancelar? Se perderán los datos.';
+            }
+
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: confirmMessage,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No, mantener',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (formType === 'regForm') {
+                        closePopup();
+                        clearForm();
+                    } else if (formType === 'editForm') {
+                        closeEditPopup();
+                        clearEditForm();
+                    } else {
+                        closeCategoryPopup();
+                        clearCategoryForm();
+                    }
+                }
+            });
+        }
+
+        function showSuccessMessage(event, popupId, formId, message) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¡Éxito!',
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            }).then(() => {
+                document.getElementById(popupId).style.display = 'none';
+                document.getElementById(formId).reset();
+            });
+        }
+
+        function confirmDelete(event) {
+            event.preventDefault(); // Prevenir la acción predeterminada del botón
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: '¿Está seguro de eliminar el registro?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'No, cancelar',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Continuar con la acción de eliminar el registro
+                    Swal.fire('¡Eliminado!', 'El registro ha sido eliminado.', 'success');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
