@@ -12,8 +12,9 @@ import datetime
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_login import login_required as flask_login_required
 from datetime import datetime as dt
-from flask import jsonify  # Asegúrate de que esta línea está en la parte superior de tu archivo
+from flask import jsonify  
 from werkzeug.utils import secure_filename
+from sqlalchemy import or_
 #funcion para asignar permiso de acceso a rol
 def redirect_based_on_role(user):
     if user.rol_id_rol == 'cliente':
@@ -417,7 +418,7 @@ def perfil_user():
     return render_template('perfil_usuario.html')
 
 
-#-----------------productos - vista ADMIN------------------
+#-----------------productos - vista ADMIN-----------------------
 # Configuración para subir archivos
 UPLOAD_FOLDER = 'static/uploads/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -430,82 +431,131 @@ if not os.path.exists(UPLOAD_FOLDER):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Ruta para mostrar la página de registro de productos
-@app.route('/regproducto')
+# Ruta para registrar una nueva categoría
+@app.route('/add_category', methods=['POST'])
 @login_required
-def reg_producto():
-    productos = Producto.query.all()
-    categorias = CategoriaProducto.query.all()
-    return render_template('RegProducto.html', productos=productos, categorias=categorias)
-
-# Ruta para mostrar la página de categorías de productos
-@app.route('/categoriaProducto')
-@login_required
-def categoria_producto():
-    categorias = CategoriaProducto.query.all()
-    return render_template('categoriaProducto.html', categorias=categorias)
-
-# Ruta para agregar una nueva categoría de producto
-@app.route('/add_categoria_producto', methods=['POST'])
-@login_required
-def add_categoria_producto():
-    nombre = request.form.get('nombre')
-    if not nombre:
+def add_category():
+    nombre_categoria = request.form.get('nombre')
+    
+    if not nombre_categoria:
         flash('El nombre de la categoría es obligatorio.', 'error')
-        return redirect(url_for('categoria_producto'))
+        return redirect(url_for('food_panel'))
 
-    nueva_categoria = CategoriaProducto(nombre=nombre)
+    nueva_categoria = CategoriaProducto(nombre=nombre_categoria)
+    
     try:
         db.session.add(nueva_categoria)
         db.session.commit()
-        flash('Categoría registrada exitosamente.', 'success')
+        flash('Categoría registrada con éxito.', 'success')
     except SQLAlchemyError as e:
         db.session.rollback()
         flash('Error al registrar la categoría: ' + str(e), 'error')
-    
-    return redirect(url_for('categoria_producto'))
 
-# Ruta para agregar un nuevo producto
-@app.route('/add_producto', methods=['POST'])
+    return redirect(url_for('food_panel'))
+
+# Ruta para renderizar el panel de productos/comida
+@app.route('/food_panel', methods=['GET'])
 @login_required
-def add_producto():
-    nombre = request.form.get('nombre')
-    descripcion = request.form.get('descripcion')
-    precio = request.form.get('precio')
-    max_personas = request.form.get('max_personas')
-    categoria_id = request.form.get('categoria')
+def food_panel():
+    search_query = request.args.get('search', '').strip()
+    sort_by = request.args.get('sort_by', 'nombre')
+    sort_order = request.args.get('sort_order', 'asc')
+    group_by = request.args.get('group_by', '')
+
+    query = Producto.query
+
+    if search_query:
+        query = query.filter(Producto.nombre.ilike(f"%{search_query}%"))
+
+    if group_by == "archivados":
+        query = query.filter(Producto.activo == False)
+    elif group_by:
+        query = query.filter(Producto.categoria_producto_id_catProducto == group_by)
+    else:
+        query = query.filter((Producto.activo == True) | (Producto.activo == None))
+
+    if sort_by and sort_order:
+        if sort_order == 'asc':
+            query = query.order_by(getattr(Producto, sort_by).asc())
+        else:
+            query = query.order_by(getattr(Producto, sort_by).desc())
+
+    productos = query.all()
+    categorias = CategoriaProducto.query.all()
+
+    return render_template('food-panel.html', productos=productos, categorias=categorias, selected_category=group_by)
+
+# Ruta para obtener la información de un producto específico
+@app.route('/get_producto/<int:producto_id>')
+@login_required
+def get_producto(producto_id):
+    producto = Producto.query.get_or_404(producto_id)
+    return jsonify({
+        'nombre': producto.nombre,
+        'descripcion': producto.descripcion,
+        'precio': producto.precio,
+        'max_personas': producto.max_personas,
+        'categoria_producto_id_catProducto': producto.categoria_producto_id_catProducto
+    })
+
+# Ruta para actualizar un producto
+@app.route('/update_producto/<int:producto_id>', methods=['POST'])
+@login_required
+def update_producto(producto_id):
+    producto = Producto.query.get_or_404(producto_id)
+
+    producto.nombre = request.form.get('nombre')
+    producto.descripcion = request.form.get('descripcion')
+    producto.precio = float(request.form.get('precio'))
+    producto.max_personas = int(request.form.get('max_personas'))
+    producto.categoria_producto_id_catProducto = int(request.form.get('categoria'))
+
     imagen = request.files.get('imagen')
+    if imagen and allowed_file(imagen.filename):
+        # Guardar la nueva imagen
+        filename = secure_filename(imagen.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        imagen.save(filepath)
+        producto.imagen = filepath
 
-    if not nombre or not descripcion or not precio or not max_personas or not categoria_id or not imagen:
-        flash('Todos los campos son obligatorios.', 'error')
-        return redirect(url_for('reg_producto'))
-
-    if not allowed_file(imagen.filename):
-        flash('Solo se permiten archivos de imagen con extensión .png, .jpg, .jpeg.', 'error')
-        return redirect(url_for('reg_producto'))
-
-    # Guardar la imagen
-    filename = secure_filename(imagen.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    imagen.save(filepath)
-
-    nuevo_producto = Producto(
-        nombre=nombre,
-        descripcion=descripcion,
-        precio=float(precio),
-        max_personas=int(max_personas),
-        imagen=filepath,
-        categoria_producto_id_catProducto=int(categoria_id)
-    )
     try:
-        db.session.add(nuevo_producto)
         db.session.commit()
-        flash('Producto registrado exitosamente.', 'success')
+        flash('Producto actualizado exitosamente.', 'success')
     except SQLAlchemyError as e:
         db.session.rollback()
-        flash('Error al registrar el producto: ' + str(e), 'error')
+        flash('Error al actualizar el producto: ' + str(e), 'error')
     
-    return redirect(url_for('reg_producto'))
+    return redirect(url_for('food_panel'))
+
+#ruta para eliminar un producto de manera logica(arhivar)
+@app.route('/delete_producto/<int:producto_id>', methods=['POST'])
+@login_required
+def delete_producto(producto_id):
+    producto = Producto.query.get_or_404(producto_id)
+    producto.activo = False  # Baja lógica
+    try:
+        db.session.commit()
+        flash('Producto eliminado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al eliminar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('food_panel'))
+
+# desarchivar un producto
+@app.route('/unarchive_producto/<int:producto_id>', methods=['POST'])
+@login_required
+def unarchive_producto(producto_id):
+    producto = Producto.query.get_or_404(producto_id)
+    producto.activo = True
+    try:
+        db.session.commit()
+        flash('Producto desarchivado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al desarchivar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('food_panel'))
 #-----------------------------------------------------------------
 
 

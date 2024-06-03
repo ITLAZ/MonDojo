@@ -50,6 +50,7 @@
         }
 
         .search-container button,
+        .group-by-container button,
         .add-buttons button {
             margin-left: 10px;
             margin-right: 10px;
@@ -73,6 +74,14 @@
             margin-left: 10px;
             margin-right: 10px;
         }
+        
+        .group-by-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            gap: 20px; 
+        }
     </style>
 </head>
 <body>
@@ -81,23 +90,32 @@
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
         <ul class="nav-items">
-            <li><a href="adminpanel.html">Inicio</a></li>
-            <li><a href="userspanel.html">Usuarios</a></li>
+            <li><a href="/adminpanel">Inicio</a></li>
+            <li><a href="/userspanel">Usuarios</a></li>
             <li><a href="/juegos">Juegos</a></li>
-            <li><a href="food-panel.html">Comida</a></li>
+            <li><a href="/food_panel">Comida</a></li>
             <li><a href="/mesas">Mesas</a></li>
             <li><a href="/reservas">Reservas</a></li>
             <li><a href="/pedidos">Pedidos</a></li>
-            <li><a href="/empleados">Empleados</a></li>
-            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li>
+            <li><a href="/perfil_admin"><i class="fa-solid fa-user-gear"></i></a></li>
         </ul>
     </nav>
     <div class="container">
         <div class="actions-container">
-            <form method="GET" action="/SearchUsuario">
+            <form method="GET" action="/food_panel">
                 <div class="search-container">
-                    <input type="text" name="search" placeholder="Buscar producto">
+                    <input type="text" name="search" placeholder="Buscar producto" value="{{ request.args.get('search', '') }}">
                     <button type="submit">Buscar <i class="fa-solid fa-search"></i></button>
+                </div>
+                <div class="group-by-container">
+                    <label for="group_by">Agrupar por:</label>
+                    <select name="group_by" id="group_by" onchange="this.form.submit()">
+                        <option value="">Todos</option>
+                        <option value="archivados" {% if selected_category == 'archivados' %}selected{% endif %}>Productos Archivados</option>
+                        {% for categoria in categorias %}
+                        <option value="{{ categoria.id_catProducto }}" {% if categoria.id_catProducto == selected_category %}selected{% endif %}>{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </form>
 
@@ -110,13 +128,13 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Nombre <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Descripción <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Precio <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Máx. Personas <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Imagen <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Categoría <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>ID <a href="{{ url_for('food_panel', search=request.args.get('search', ''), sort_by='id_producto', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'id_producto') == 'id_producto' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Nombre <a href="{{ url_for('food_panel', search=request.args.get('search', ''), sort_by='nombre', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'nombre') == 'nombre' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Descripción <a href="{{ url_for('food_panel', search=request.args.get('search', ''), sort_by='descripcion', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'descripcion') == 'descripcion' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Precio <a href="{{ url_for('food_panel', search=request.args.get('search', ''), sort_by='precio', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'precio') == 'precio' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Máx. Personas <a href="{{ url_for('food_panel', search=request.args.get('search', ''), sort_by='max_personas', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'max_personas') == 'max_personas' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Imagen</th>
+                        <th>Categoría <a href="{{ url_for('food_panel', search=request.args.get('search', ''), sort_by='categoria_producto_id_catProducto', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'categoria_producto_id_catProducto') == 'categoria_producto_id_catProducto' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -133,7 +151,11 @@
                         <td>
                             <div class="action-buttons">
                                 <button class="editProductBtn" data-id="{{ producto.id_producto }}"><i class="fa-solid fa-edit"></i></button>
-                                <button class="deleteProductBtn" onclick="confirmDelete(event)"><i class="fa-solid fa-trash"></i></button>
+                                {% if producto.activo %}
+                                    <button class="deleteProductBtn" onclick="confirmDelete(event, '{{ producto.id_producto }}')"><i class="fa-solid fa-trash"></i></button>
+                                {% else %}
+                                    <button class="unarchiveProductBtn" onclick="confirmUnarchive(event, '{{ producto.id_producto }}')"><i class="fa-solid fa-box-open"></i></button>
+                                {% endif %}
                             </div>
                         </td>                        
                     </tr>
@@ -158,7 +180,7 @@
                     <span class="step" onclick="showTab(2)" id="step3">3</span>
                 </div>
             </div>
-            <form id="regForm" onsubmit="showSuccessMessage(event, 'contactPopup', 'regForm', 'Datos registrados con éxito')">
+            <form id="regForm" action="/add_producto" method="POST" enctype="multipart/form-data" onsubmit="handleProductoSubmit(event)">
                 <div class="tab">
                     <div class="form-group">
                         <label for="nombre">Nombre</label>
@@ -166,29 +188,24 @@
                         <span class="error-message" id="error-nombre"></span>
                     </div> 
                     <div class="form-group">
-                        <label for="email">Correo</label>
-                        <input type="email" id="email" name="email" required>
-                        <span class="error-message" id="error-email"></span>
-                    </div>  
-                </div>
-                <div class="tab"> 
-                    <div class="form-group">
                         <label for="descripcion">Descripción</label>
                         <input type="text" id="descripcion" name="descripcion" required>
                         <span class="error-message" id="error-descripcion"></span>
                     </div>
+                </div>
+                <div class="tab"> 
                     <div class="form-group">
                         <label for="precio">Precio</label>
                         <input type="number" id="precio" name="precio" step="0.01" required>
                         <span class="error-message" id="error-precio"></span>
                     </div>
-                </div>
-                <div class="tab">
                     <div class="form-group">
                         <label for="max_personas">Máx. Personas</label>
                         <input type="number" id="max_personas" name="max_personas" required>
                         <span class="error-message" id="error-max_personas"></span>
                     </div>
+                </div>
+                <div class="tab">
                     <div class="form-group">
                         <label for="imagen">Imagen</label>
                         <input type="file" id="imagen" name="imagen" accept="image/png, image/jpeg, image/jpg" required>
@@ -212,80 +229,76 @@
     </div>
 
     <!-- EDITAR PRODUCTO (COMIDA) POP-UP -->
-    <div class="popup" id="editPopup">
-        <div class="popup-content">
-            <span class="close-btn" onclick="closeEditPopup()">&times;</span>
-            <img src="../static/images/hamburguer.png" alt="Product Icon" class="product-icon">
-            <h2>EDITAR PRODUCTO</h2>
-            <div class="step-indicator">
-                <div class="step-container">
-                    <span class="step" onclick="showEditTab(0)" id="step1">1</span>
-                    <span class="step-line"></span>
-                    <span class="step" onclick="showEditTab(1)" id="step2">2</span>
-                    <span class="step-line"></span>
-                    <span class="step" onclick="showEditTab(2)" id="step3">3</span>
+<div class="popup" id="editPopup">
+    <div class="popup-content">
+        <span class="close-btn" onclick="closeEditPopup()">&times;</span>
+        <img src="../static/images/hamburguer.png" alt="Product Icon" class="product-icon">
+        <h2>EDITAR PRODUCTO</h2>
+        <div class="step-indicator">
+            <div class="step-container">
+                <span class="step" onclick="showEditTab(0)" id="step1">1</span>
+                <span class="step-line"></span>
+                <span class="step" onclick="showEditTab(1)" id="step2">2</span>
+                <span class="step-line"></span>
+                <span class="step" onclick="showEditTab(2)" id="step3">3</span>
+            </div>
+        </div>
+        <form id="editForm" method="POST" onsubmit="handleEditProductoSubmit(event)">
+            <div class="tab">
+                <div class="form-group">
+                    <label for="edit_nombre">Nombre</label>
+                    <input type="text" id="edit_nombre" name="nombre" required>
+                    <span class="error-message" id="edit-error-nombre"></span>
+                </div> 
+                <div class="form-group">
+                    <label for="edit_descripcion">Descripción</label>
+                    <input type="text" id="edit_descripcion" name="descripcion" required>
+                    <span class="error-message" id="edit-error-descripcion"></span>
                 </div>
             </div>
-            <form id="editForm" onsubmit="showSuccessMessage(event, 'editPopup', 'editForm', 'Datos registrados con éxito')">
-                <div class="tab">
-                    <div class="form-group">
-                        <label for="edit_nombre">Nombre</label>
-                        <input type="text" id="edit_nombre" name="nombre" required>
-                        <span class="error-message" id="edit-error-nombre"></span>
-                    </div> 
-                    <div class="form-group">
-                        <label for="edit_email">Correo</label>
-                        <input type="email" id="edit_email" name="email" required>
-                        <span class="error-message" id="edit-error-email"></span>
-                    </div>  
+            <div class="tab"> 
+                <div class="form-group">
+                    <label for="edit_precio">Precio</label>
+                    <input type="number" id="edit_precio" name="precio" step="0.01" required>
+                    <span class="error-message" id="edit-error-precio"></span>
                 </div>
-                <div class="tab"> 
-                    <div class="form-group">
-                        <label for="edit_descripcion">Descripción</label>
-                        <input type="text" id="edit_descripcion" name="descripcion" required>
-                        <span class="error-message" id="edit-error-descripcion"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_precio">Precio</label>
-                        <input type="number" id="edit_precio" name="precio" step="0.01" required>
-                        <span class="error-message" id="edit-error-precio"></span>
-                    </div>
+                <div class="form-group">
+                    <label for="edit_max_personas">Máx. Personas</label>
+                    <input type="number" id="edit_max_personas" name="max_personas" required>
+                    <span class="error-message" id="edit-error-max_personas"></span>
                 </div>
-                <div class="tab">
-                    <div class="form-group">
-                        <label for="edit_max_personas">Máx. Personas</label>
-                        <input type="number" id="edit_max_personas" name="max_personas" required>
-                        <span class="error-message" id="edit-error-max_personas"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_imagen">Imagen</label>
-                        <input type="file" id="edit_imagen" name="imagen" accept="image/png, image/jpeg, image/jpg" required>
-                        <span class="error-message" id="edit-error-imagen"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_categoria">Categoría</label>
-                        <select id="edit_categoria" name="categoria" required>
-                            {% for categoria in categorias %}
-                            <option value="{{ categoria.id_catProducto }}">{{ categoria.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="buttons">
-                        <button type="submit">Guardar Cambios</button>
-                        <button type="button" onclick="confirmCancel('editForm')">Cancelar</button>
-                    </div>
+            </div>
+            <div class="tab">
+                <div class="form-group">
+                    <label for="edit_imagen">Imagen</label>
+                    <input type="file" id="edit_imagen" name="imagen" accept="image/png, image/jpeg, image/jpg">
+                    <span class="error-message" id="edit-error-imagen"></span>
                 </div>
-            </form>
-        </div>
+                <div class="form-group">
+                    <label for="edit_categoria">Categoría</label>
+                    <select id="edit_categoria" name="categoria" required>
+                        {% for categoria in categorias %}
+                        <option value="{{ categoria.id_catProducto }}">{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="buttons">
+                    <button type="submit">Guardar Cambios</button>
+                    <button type="button" onclick="confirmCancel('editForm')">Cancelar</button>
+                </div>
+            </div>
+        </form>
     </div>
+</div>
 
+<!--enrutado-->
     <!-- AGREGAR CATEGORÍA POP-UP -->
     <div class="popup" id="categoryPopup">
         <div class="popup-content">
             <span class="close-btn" onclick="closeCategoryPopup()">&times;</span>
             <img src="../static/images/category.png" alt="Category Icon" class="product-icon">
             <h2>REGISTRO NUEVA CATEGORÍA</h2>
-            <form id="categoryForm" onsubmit="showSuccessMessage(event, 'categoryPopup', 'categoryForm', 'Categoría registrada con éxito')">
+            <form id="categoryForm" action="/add_category" method="POST" onsubmit="handleCategorySubmit(event)">
                 <div class="form-group">
                     <label for="categoria_nombre">Nombre de la categoría</label>
                     <input type="text" id="categoria_nombre" name="nombre" required>
@@ -312,13 +325,26 @@
             document.getElementById('categoryPopup').style.display = 'block';
         });
 
-        document.querySelectorAll('.editProductBtn').forEach(function(button) {
-            button.addEventListener('click', function() {
-                document.getElementById('editPopup').style.display = 'block';
-                showEditTab(0);
-            });
-        });
 
+        document.querySelectorAll('.editProductBtn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = button.getAttribute('data-id');
+            fetch(`/get_producto/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('edit_nombre').value = data.nombre;
+                    document.getElementById('edit_descripcion').value = data.descripcion;
+                    document.getElementById('edit_precio').value = data.precio;
+                    document.getElementById('edit_max_personas').value = data.max_personas;
+                    document.getElementById('edit_categoria').value = data.categoria_producto_id_catProducto;
+                    document.getElementById('editForm').action = `/update_producto/${productId}`;
+                    document.getElementById('editPopup').style.display = 'block';
+                    showEditTab(0);
+                })
+                .catch(error => console.error('Error al cargar los datos del producto:', error));
+        });
+    });
+    
         function showTab(n) {
             let tabs = document.getElementById("regForm").getElementsByClassName("tab");
             for (let i = 0; i < tabs.length; i++) {
@@ -422,6 +448,95 @@
             });
         }
 
+        function handleProductoSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            fetch(form.action, {
+                method: form.method,
+                body: new FormData(form)
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSuccessMessage(event, 'contactPopup', 'regForm', 'Producto registrado con éxito');
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                console.error('Error al registrar el producto:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Hubo un problema al registrar el producto.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'swal2-confirm'
+                    }
+                });
+            });
+        }
+
+        //manejar posteo categoria
+        function handleCategorySubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            fetch(form.action, {
+                method: form.method,
+                body: new FormData(form)
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSuccessMessage(event, 'categoryPopup', 'categoryForm', 'Categoría registrada con éxito');
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                console.error('Error al registrar la categoría:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Hubo un problema al registrar la categoría.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'swal2-confirm'
+                    }
+                });
+            });
+        }
+    
+
+        //posteo editar producto
+        function handleEditProductoSubmit(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: form.method,
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                showSuccessMessage(event, 'editPopup', 'editForm', 'Producto actualizado con éxito');
+            } else {
+                return response.text().then(text => { throw new Error(text); });
+            }
+        })
+        .catch(error => {
+            console.error('Error al actualizar el producto:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al actualizar el producto.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            });
+        });
+    }
+
         function showSuccessMessage(event, popupId, formId, message) {
             event.preventDefault();
             Swal.fire({
@@ -435,17 +550,18 @@
             }).then(() => {
                 document.getElementById(popupId).style.display = 'none';
                 document.getElementById(formId).reset();
+                window.location.href = "/food_panel";
             });
         }
 
-        function confirmDelete(event) {
+        function confirmDelete(event, productId) {
             event.preventDefault(); // Prevenir la acción predeterminada del botón
             Swal.fire({
                 title: '¿Está seguro?',
-                text: '¿Está seguro de eliminar el registro?',
+                text: '¿Está seguro de archivar el producto?',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
+                confirmButtonText: 'Sí, archivar',
                 cancelButtonText: 'No, cancelar',
                 customClass: {
                     confirmButton: 'swal2-confirm',
@@ -453,11 +569,61 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Continuar con la acción de eliminar el registro
-                    Swal.fire('¡Eliminado!', 'El registro ha sido eliminado.', 'success');
+                    fetch(`/delete_producto/${productId}`, {
+                        method: 'POST'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire('¡Archivado!', 'El producto ha sido archivado.', 'success').then(() => {
+                                window.location.href = "/food_panel";  // Redirigir al panel de productos/comida para ver los cambios
+                            });
+                        } else {
+                            return response.text().then(text => { throw new Error(text); });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al archivar el producto:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Hubo un problema al archivar el producto.',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                confirmButton: 'swal2-confirm'
+                            }
+                        });
+                    });
                 }
             });
         }
+        function confirmUnarchive(event, productId) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: '¿Está seguro de desarchivar el producto?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, desarchivar',
+                cancelButtonText: 'No, cancelar',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/unarchive_producto/${productId}`, {
+                        method: 'POST'
+                    }).then(() => {
+                        Swal.fire('¡Desarchivado!', 'El producto ha sido desarchivado.', 'success')
+                            .then(() => window.location.reload());
+                    }).catch(error => {
+                        Swal.fire('Error', 'No se pudo desarchivar el producto.', 'error');
+                    });
+                }
+            });
+        }
+
+
     </script>
 </body>
 </html>
