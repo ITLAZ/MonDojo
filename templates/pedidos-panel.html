@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Monster Dojo - Panel de Pedidos Vista Admin</title>
+    <!-- Link css -->
+    <link rel="stylesheet" href="../static/css/food-panel.css">
+    <link rel="stylesheet" href="../static/css/popup_panel.css">
+    <!-- Link fonts -->
+    <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Estilos para las alertas -->
+    <style>
+        .swal2-cancel {
+            background-color: #192847 !important;
+            color: #fff !important;
+        }
+        .swal2-confirm {
+            background-color: #d48600 !important;
+            color: #fff !important;
+            width: 120px !important; 
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .action-buttons button {
+            background-color: var(--alt-primary-color);
+            color: var(--light-color);
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .action-buttons button i {
+            pointer-events: none;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            gap: 20px; 
+        }
+
+        .search-container button,
+        .add-buttons button {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .add-buttons {
+            display: flex;
+            gap: 20px; /* Espacio entre los botones de agregar producto y categoría */
+        }
+
+        .add-product button,
+        .add-category button {
+            width: auto;
+            background-color: var(--alt-primary-color);
+            color: var(--light-color);
+            font-size: 15px;
+            border: none;
+            padding: 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <ul class="nav-items">
+            <li><a href="adminpanel.html">Inicio</a></li>
+            <li><a href="userspanel.html">Usuarios</a></li>
+            <li><a href="games-panel.html">Juegos</a></li>
+            <li><a href="food-panel.html">Comida</a></li>
+            <li><a href="registrar-mesas.html">Mesas</a></li>
+            <li><a href="reservas-panel.html">Reservas</a></li>
+            <li><a href="pedidos-panel.html">Pedidos</a></li>
+            <li><a href="/empleados">Empleados</a></li>
+            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="actions-container">
+            <form method="GET" action="/SearchReservas">
+                <div class="search-container">
+                    <input type="text" name="search" placeholder="Buscar pedido">
+                    <button type="submit">Buscar <i class="fa-solid fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Cliente <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Tipo Pedido <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Estado Pedido <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Fecha y Hora <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Monto Total <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos %}
+                    <tr>
+                        <td>{{ pedido.id_pedido }}</td>
+                        <td>{{ pedido.nombre }}</td>
+                        <td>{{ pedido.tipo }}</td>
+                        <td>{{ pedido.estado }}</td>
+                        <td>{{ pedido.fecha_hora }}</td>
+                        <td>{{ pedido.monto_total }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="verDetallesBtn" data-id="{{ pedido.id_pedido }}"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                                <button class="deleteReservaBtn" onclick="confirmDelete(event)"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SCRIPT POP-UP -->
+    <script>
+        function confirmDelete(event) {
+            event.preventDefault(); // Prevenir la acción predeterminada del botón
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: '¿Está seguro de eliminar el registro?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'No, cancelar',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Continuar con la acción de eliminar el registro
+                    Swal.fire('¡Eliminado!', 'El registro ha sido eliminado.', 'success');
+                }
+            });
+        }
+
+        document.querySelectorAll('.verDetallesBtn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const idReserva = this.getAttribute('data-id');
+                window.location.href = `verDetalle-pedido.html?id=${idReserva}`;
+            });
+        });
+    </script>
+</body>
+</html>
