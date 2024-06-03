@@ -485,6 +485,50 @@ def food_panel():
 
     return render_template('food-panel.html', productos=productos, categorias=categorias, selected_category=group_by)
 
+
+#agregar un nuevo producto
+@app.route('/add_producto', methods=['POST'])
+@login_required
+def add_producto():
+    nombre = request.form.get('nombre')
+    descripcion = request.form.get('descripcion')
+    precio = request.form.get('precio')
+    max_personas = request.form.get('max_personas')
+    categoria_id = request.form.get('categoria')
+    imagen = request.files.get('imagen')
+
+    if not nombre or not descripcion or not precio or not max_personas or not categoria_id or not imagen:
+        flash('Todos los campos son obligatorios.', 'error')
+        return redirect(url_for('food_panel'))
+
+    if not allowed_file(imagen.filename):
+        flash('Solo se permiten archivos de imagen con extensión .png, .jpg, .jpeg.', 'error')
+        return redirect(url_for('food_panel'))
+
+    # Guardar la imagen
+    filename = secure_filename(imagen.filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    imagen.save(filepath)
+
+    nuevo_producto = Producto(
+        nombre=nombre,
+        descripcion=descripcion,
+        precio=float(precio),
+        max_personas=int(max_personas),
+        imagen=filepath,
+        categoria_producto_id_catProducto=int(categoria_id),
+        activo=True  # Establecer el producto como activo
+    )
+    try:
+        db.session.add(nuevo_producto)
+        db.session.commit()
+        flash('Producto registrado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al registrar el producto: ' + str(e), 'error')
+
+    return redirect(url_for('food_panel'))
+
 # Ruta para obtener la información de un producto específico
 @app.route('/get_producto/<int:producto_id>')
 @login_required

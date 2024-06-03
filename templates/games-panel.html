@@ -129,23 +129,33 @@
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
         <ul class="nav-items">
-            <li><a href="adminpanel.html">Inicio</a></li>
-            <li><a href="userspanel.html">Usuarios</a></li>
-            <li><a href="games-panel.html">Juegos</a></li>
-            <li><a href="food-panel.html">Comida</a></li>
+            <li><a href="/adminpanel">Inicio</a></li>
+            <li><a href="/userspanel">Usuarios</a></li>
+            <li><a href="/game_panel">Juegos</a></li>
+            <li><a href="/food_panel">Comida</a></li>
             <li><a href="registrar-mesas.html">Mesas</a></li>
             <li><a href="reservas-panel.html">Reservas</a></li>
             <li><a href="pedidos-panel.html">Pedidos</a></li>
-            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li><
-        </ul>
+            <li><a href="/perfil_admin"><i class="fa-solid fa-user-gear"></i></a></li>
+         </ul>
     </nav>
     <div class="container">
         <div class="title">Panel de Juegos</div>
         <div class="actions-container">
-            <form method="GET" action="/SearchJuego">
+            <form method="GET" action="/game_panel">
                 <div class="search-container">
                     <input type="text" name="search" placeholder="Buscar juego">
                     <button type="submit">Buscar <i class="fa-solid fa-search"></i></button>
+                </div>
+                <div class="group-by-container">
+                    <label for="group_by">Agrupar por:</label>
+                    <select name="group_by" id="group_by" onchange="this.form.submit()">
+                        <option value="">Todos</option>
+                        <option value="archivados" {% if selected_category == 'archivados' %}selected{% endif %}>Productos Archivados</option>
+                        {% for categoria in categorias %}
+                        <option value="{{ categoria.id_catJuego }}" {% if categoria.id_catJuego == selected_category %}selected{% endif %}>{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </form>
 
@@ -158,14 +168,14 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Nombre <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Descripción <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Precio Alquiler <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Precio Venta <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Disponible Venta<button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Imagen <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Categoría <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>ID <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='id_juego', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'id_juego') == 'id_juego' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Nombre <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='nombre', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'nombre') == 'nombre' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Descripción <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='descripcion', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'descripcion') == 'descripcion' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Precio Alquiler <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='precio_alquiler', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'precio_alquiler') == 'precio_alquiler' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Precio Venta<a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='precio_venta', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'precio_venta') == 'precio_venta' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Disponible Venta<a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='disponible_venta', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'disponible_venta') == 'disponible_venta' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Imagen</th>
+                        <th>Categoría <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='categoria_juego_id_catJuego', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'categoria_juego_id_catJuego') == 'categoria_juego_id_catJuego' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -183,7 +193,11 @@
                         <td>
                             <div class="action-buttons">
                                 <button class="editGameBtn" data-id="{{ juego.id_juego }}"><i class="fa-solid fa-edit"></i></button>
-                                <button class="deleteGameBtn" onclick="confirmDelete(event)"><i class="fa-solid fa-trash"></i></button>
+                                {% if producto.activo %}
+                                <button class="deleteGameBtn" onclick="confirmDelete(event, '{{ juego.id_juego }}')"><i class="fa-solid fa-trash"></i></button>
+                                {% else %}
+                                <button class="unarchiveProductBtn" onclick="confirmUnarchive(event, '{{ juego.id_juego }}')"><i class="fa-solid fa-box-open"></i></button>
+                                {% endif %}
                             </div>
                         </td>                        
                     </tr>
