@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reserva</title>
+    <link rel="stylesheet" href="../static/css/reserva-activa.css">
+    <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="navbar">
+        <div class="nav-logo">
+            <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <button class="menu-toggle" id="mobile-menu">
+            <span class="fas fa-bars"></span>
+        </button>
+        <div class="navbar-right">
+            <a href="/">Home</a>
+            <a href="#about">Sobre nosotros</a>
+            <a href="#menu">Menú</a>
+            <a href="#order">Ubicación</a>
+            <a href="/login">Iniciar Sesión</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="reservation-section">
+            <h2>Reserva Actual</h2>
+            <div class="reservation-info">
+                <label for="name">Nombre:</label>
+                <p id="name">Juan Pérez</p>
+                <label for="email">Correo Electrónico:</label>
+                <p id="email">correo@correo.com</p>
+                <label for="phone">Teléfono:</label>
+                <p id="phone">1234567890</p>
+                <label for="date">Fecha:</label>
+                <p id="date">2021-12-31</p>
+                <label for="time">Hora:</label>
+                <p id="time">18:00</p>
+                <label for="guests">Número de Personas:</label>
+                <p id="guests">4</p>
+                <span><i class="fas fa-info-circle"></i> Tomar en cuenta: Se permiten hasta 10 minutos de retraso, la reserva se cancela automaticamente en caso de llegar más tarde.</span>
+            </div>
+            <div class="reservation-actions">
+                <button class="cancel-btn">Cancelar Reserva</button>
+                <button class="edit-btn">Modificar Reserva</button>
+            </div>
+        </div>
+</body>
