@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles de la Reserva</title>
+    <!-- Link css -->
+    <link rel="stylesheet" href="../static/css/food-panel.css">
+    <link rel="stylesheet" href="../static/css/popup_panel.css">
+    <!-- Link fonts -->
+    <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Estilos personalizados -->
+    <style>
+        .swal2-cancel {
+            background-color: #192847 !important;
+            color: #fff !important;
+        }
+        .swal2-confirm {
+            background-color: #d48600 !important;
+            color: #fff !important;
+            width: 120px !important; 
+        }
+        .container {
+            padding: 20px;
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: #f9bf03; 
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .header-container div {
+            width: 48%;
+        }
+        .header-container div p {
+            margin: 5px 0;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .table-summary {
+            margin-top: 20px;
+            text-align: right;
+            background-color: #f9bf03; 
+            padding: 15px;
+            border-radius: 10px;
+            width: 250px; 
+            margin-left: auto;
+        }
+        .table-summary p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <ul class="nav-items">
+            <li><a href="adminpanel.html">Inicio</a></li>
+            <li><a href="userspanel.html">Usuarios</a></li>
+            <li><a href="games-panel.html">Juegos</a></li>
+            <li><a href="food-panel.html">Comida</a></li>
+            <li><a href="registrar-mesas.html">Mesas</a></li>
+            <li><a href="reservas-panel.html">Reservas</a></li>
+            <li><a href="pedidos-panel.html">Pedidos</a></li>
+            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="title">Detalle de la reserva</div>
+        <div class="header-container">
+            <div>
+                <p><strong>Cliente:</strong> {{ cliente.nombre }}</p>
+                <p><strong>Mesa:</strong> {{ mesa.mesa }}</p>
+            </div>
+            <div>
+                <p><strong>Fecha y hora de la reserva:</strong> {{ reserva.fecha_hora }}</p>
+                <p><strong>Estado:</strong> {{ reserva.estado }}</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio unitario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                    <tr>
+                        <td>{{ reserva.producto }}</td>
+                        <td>{{ reserva.cantidad }}</td>
+                        <td>{{ reserva.precio_unitario }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="table-summary">
+            <p><strong>Total:</strong> {{ reserva.total }} Bs.</p>
+        </div>
+    </div>
+</body>
+</html>

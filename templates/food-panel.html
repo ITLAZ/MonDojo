@@ -74,13 +74,29 @@
             margin-left: 10px;
             margin-right: 10px;
         }
-        
+
         .group-by-container {
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             margin-top: 10px;
-            gap: 20px; 
+            gap: 5px; 
+        }
+
+        .group-by-container label {
+            font-size: 14px;
+        }
+
+        .group-by-container select {
+            font-size: 14px;
+            padding: 5px;
+            width: 150px; /* Ajustar el tamaño del select */
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -90,17 +106,18 @@
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
         <ul class="nav-items">
-            <li><a href="/adminpanel">Inicio</a></li>
-            <li><a href="/userspanel">Usuarios</a></li>
-            <li><a href="/juegos">Juegos</a></li>
-            <li><a href="/food_panel">Comida</a></li>
-            <li><a href="/mesas">Mesas</a></li>
-            <li><a href="/reservas">Reservas</a></li>
-            <li><a href="/pedidos">Pedidos</a></li>
-            <li><a href="/perfil_admin"><i class="fa-solid fa-user-gear"></i></a></li>
+            <li><a href="adminpanel.html">Inicio</a></li>
+            <li><a href="userspanel.html">Usuarios</a></li>
+            <li><a href="games-panel.html">Juegos</a></li>
+            <li><a href="food-panel.html">Comida</a></li>
+            <li><a href="registrar-mesas.html">Mesas</a></li>
+            <li><a href="reservas-panel.html">Reservas</a></li>
+            <li><a href="pedidos-panel.html">Pedidos</a></li>
+            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li>
         </ul>
     </nav>
     <div class="container">
+        <div class="title">Panel de Productos/Comida</div>
         <div class="actions-container">
             <form method="GET" action="/food_panel">
                 <div class="search-container">
@@ -171,80 +188,55 @@
             <span class="close-btn" onclick="closePopup()">&times;</span>
             <img src="../static/images/menu.png" alt="Product Icon" class="product-icon">
             <h2>REGISTRO NUEVO PRODUCTO</h2>
-            <div class="step-indicator">
-                <div class="step-container">
-                    <span class="step" onclick="showTab(0)" id="step1">1</span>
-                    <span class="step-line"></span>
-                    <span class="step" onclick="showTab(1)" id="step2">2</span>
-                    <span class="step-line"></span>
-                    <span class="step" onclick="showTab(2)" id="step3">3</span>
-                </div>
-            </div>
             <form id="regForm" action="/add_producto" method="POST" enctype="multipart/form-data" onsubmit="handleProductoSubmit(event)">
-                <div class="tab">
-                    <div class="form-group">
-                        <label for="nombre">Nombre</label>
-                        <input type="text" id="nombre" name="nombre" required>
-                        <span class="error-message" id="error-nombre"></span>
-                    </div> 
-                    <div class="form-group">
-                        <label for="descripcion">Descripción</label>
-                        <input type="text" id="descripcion" name="descripcion" required>
-                        <span class="error-message" id="error-descripcion"></span>
-                    </div>
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                    <span class="error-message" id="error-nombre"></span>
+                </div> 
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <input type="text" id="descripcion" name="descripcion" required>
+                    <span class="error-message" id="error-descripcion"></span>
                 </div>
-                <div class="tab"> 
-                    <div class="form-group">
-                        <label for="precio">Precio</label>
-                        <input type="number" id="precio" name="precio" step="0.01" required>
-                        <span class="error-message" id="error-precio"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="max_personas">Máx. Personas</label>
-                        <input type="number" id="max_personas" name="max_personas" required>
-                        <span class="error-message" id="error-max_personas"></span>
-                    </div>
+                <div class="form-group">
+                    <label for="precio">Precio</label>
+                    <input type="number" id="precio" name="precio" step="0.01" required>
+                    <span class="error-message" id="error-precio"></span>
                 </div>
-                <div class="tab">
-                    <div class="form-group">
-                        <label for="imagen">Imagen</label>
-                        <input type="file" id="imagen" name="imagen" accept="image/png, image/jpeg, image/jpg" required>
-                        <span class="error-message" id="error-imagen"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="categoria">Categoría</label>
-                        <select id="categoria" name="categoria" required>
-                            {% for categoria in categorias %}
-                            <option value="{{ categoria.id_catProducto }}">{{ categoria.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="buttons">
-                        <button type="submit">Registrar</button>
-                        <button type="button" onclick="confirmCancel('regForm')">Cancelar</button>
-                    </div>
+                <div class="form-group">
+                    <label for="max_personas">Máx. Personas</label>
+                    <input type="number" id="max_personas" name="max_personas" required>
+                    <span class="error-message" id="error-max_personas"></span>
+                </div>
+                <div class="form-group">
+                    <label for="imagen">Imagen</label>
+                    <input type="file" id="imagen" name="imagen" accept="image/png, image/jpeg, image/jpg" required>
+                    <span class="error-message" id="error-imagen"></span>
+                </div>
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    <select id="categoria" name="categoria" required>
+                        {% for categoria in categorias %}
+                        <option value="{{ categoria.id_catProducto }}">{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="buttons">
+                    <button type="submit">Registrar</button>
+                    <button type="button" onclick="confirmCancel('regForm')">Cancelar</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- EDITAR PRODUCTO (COMIDA) POP-UP -->
-<div class="popup" id="editPopup">
-    <div class="popup-content">
-        <span class="close-btn" onclick="closeEditPopup()">&times;</span>
-        <img src="../static/images/hamburguer.png" alt="Product Icon" class="product-icon">
-        <h2>EDITAR PRODUCTO</h2>
-        <div class="step-indicator">
-            <div class="step-container">
-                <span class="step" onclick="showEditTab(0)" id="step1">1</span>
-                <span class="step-line"></span>
-                <span class="step" onclick="showEditTab(1)" id="step2">2</span>
-                <span class="step-line"></span>
-                <span class="step" onclick="showEditTab(2)" id="step3">3</span>
-            </div>
-        </div>
-        <form id="editForm" method="POST" onsubmit="handleEditProductoSubmit(event)">
-            <div class="tab">
+    <div class="popup" id="editPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closeEditPopup()">&times;</span>
+            <img src="../static/images/hamburguer.png" alt="Product Icon" class="product-icon">
+            <h2>EDITAR PRODUCTO</h2>
+            <form id="editForm" method="POST" onsubmit="handleEditProductoSubmit(event)">
                 <div class="form-group">
                     <label for="edit_nombre">Nombre</label>
                     <input type="text" id="edit_nombre" name="nombre" required>
@@ -255,8 +247,6 @@
                     <input type="text" id="edit_descripcion" name="descripcion" required>
                     <span class="error-message" id="edit-error-descripcion"></span>
                 </div>
-            </div>
-            <div class="tab"> 
                 <div class="form-group">
                     <label for="edit_precio">Precio</label>
                     <input type="number" id="edit_precio" name="precio" step="0.01" required>
@@ -267,8 +257,6 @@
                     <input type="number" id="edit_max_personas" name="max_personas" required>
                     <span class="error-message" id="edit-error-max_personas"></span>
                 </div>
-            </div>
-            <div class="tab">
                 <div class="form-group">
                     <label for="edit_imagen">Imagen</label>
                     <input type="file" id="edit_imagen" name="imagen" accept="image/png, image/jpeg, image/jpg">
@@ -286,12 +274,10 @@
                     <button type="submit">Guardar Cambios</button>
                     <button type="button" onclick="confirmCancel('editForm')">Cancelar</button>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 
-<!--enrutado-->
     <!-- AGREGAR CATEGORÍA POP-UP -->
     <div class="popup" id="categoryPopup">
         <div class="popup-content">
@@ -325,67 +311,23 @@
             document.getElementById('categoryPopup').style.display = 'block';
         });
 
-
         document.querySelectorAll('.editProductBtn').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = button.getAttribute('data-id');
-            fetch(`/get_producto/${productId}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('edit_nombre').value = data.nombre;
-                    document.getElementById('edit_descripcion').value = data.descripcion;
-                    document.getElementById('edit_precio').value = data.precio;
-                    document.getElementById('edit_max_personas').value = data.max_personas;
-                    document.getElementById('edit_categoria').value = data.categoria_producto_id_catProducto;
-                    document.getElementById('editForm').action = `/update_producto/${productId}`;
-                    document.getElementById('editPopup').style.display = 'block';
-                    showEditTab(0);
-                })
-                .catch(error => console.error('Error al cargar los datos del producto:', error));
+            button.addEventListener('click', function() {
+                const productId = button.getAttribute('data-id');
+                fetch(`/get_producto/${productId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('edit_nombre').value = data.nombre;
+                        document.getElementById('edit_descripcion').value = data.descripcion;
+                        document.getElementById('edit_precio').value = data.precio;
+                        document.getElementById('edit_max_personas').value = data.max_personas;
+                        document.getElementById('edit_categoria').value = data.categoria_producto_id_catProducto;
+                        document.getElementById('editForm').action = `/update_producto/${productId}`;
+                        document.getElementById('editPopup').style.display = 'block';
+                    })
+                    .catch(error => console.error('Error al cargar los datos del producto:', error));
+            });
         });
-    });
-    
-        function showTab(n) {
-            let tabs = document.getElementById("regForm").getElementsByClassName("tab");
-            for (let i = 0; i < tabs.length; i++) {
-                tabs[i].style.display = "none";
-            }
-            tabs[n].style.display = "block";
-
-            let steps = document.getElementById("contactPopup").getElementsByClassName("step");
-            let lines = document.getElementById("contactPopup").getElementsByClassName("step-line");
-            for (let i = 0; i < steps.length; i++) {
-                steps[i].className = steps[i].className.replace(" active", "");
-                if (i < lines.length) {
-                    lines[i].className = lines[i].className.replace(" active", "");
-                }
-            }
-            steps[n].className += " active";
-            for (let i = 0; i < n; i++) {
-                lines[i].className += " active";
-            }
-        }
-
-        function showEditTab(n) {
-            let tabs = document.getElementById("editForm").getElementsByClassName("tab");
-            for (let i = 0; i < tabs.length; i++) {
-                tabs[i].style.display = "none";
-            }
-            tabs[n].style.display = "block";
-
-            let steps = document.getElementById("editPopup").getElementsByClassName("step");
-            let lines = document.getElementById("editPopup").getElementsByClassName("step-line");
-            for (let i = 0; i < steps.length; i++) {
-                steps[i].className = steps[i].className.replace(" active", "");
-                if (i < lines.length) {
-                    lines[i].className = lines[i].className.replace(" active", "");
-                }
-            }
-            steps[n].className += " active";
-            for (let i = 0; i < n; i++) {
-                lines[i].className += " active";
-            }
-        }
 
         function closePopup() {
             document.getElementById('contactPopup').style.display = 'none';
@@ -399,27 +341,8 @@
             document.getElementById('categoryPopup').style.display = 'none';
         }
 
-        function clearForm() {
-            document.getElementById("regForm").reset();
-        }
-
-        function clearEditForm() {
-            document.getElementById("editForm").reset();
-        }
-
-        function clearCategoryForm() {
-            document.getElementById("categoryForm").reset();
-        }
-
         function confirmCancel(formType) {
-            let confirmMessage;
-            if (formType === 'regForm') {
-                confirmMessage = '¿Está seguro de cancelar? Se perderán los datos.';
-            } else if (formType === 'editForm') {
-                confirmMessage = '¿Está seguro de cancelar? Se perderán sus cambios.';
-            } else {
-                confirmMessage = '¿Está seguro de cancelar? Se perderán los datos.';
-            }
+            let confirmMessage = '¿Está seguro de cancelar? Se perderán los datos.';
 
             Swal.fire({
                 title: '¿Está seguro?',
@@ -436,13 +359,13 @@
                 if (result.isConfirmed) {
                     if (formType === 'regForm') {
                         closePopup();
-                        clearForm();
+                        document.getElementById("regForm").reset();
                     } else if (formType === 'editForm') {
                         closeEditPopup();
-                        clearEditForm();
+                        document.getElementById("editForm").reset();
                     } else {
                         closeCategoryPopup();
-                        clearCategoryForm();
+                        document.getElementById("categoryForm").reset();
                     }
                 }
             });
@@ -476,7 +399,6 @@
             });
         }
 
-        //manejar posteo categoria
         function handleCategorySubmit(event) {
             event.preventDefault();
             const form = event.target;
@@ -504,38 +426,36 @@
                 });
             });
         }
-    
 
-        //posteo editar producto
         function handleEditProductoSubmit(event) {
-        event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
 
-        fetch(form.action, {
-            method: form.method,
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                showSuccessMessage(event, 'editPopup', 'editForm', 'Producto actualizado con éxito');
-            } else {
-                return response.text().then(text => { throw new Error(text); });
-            }
-        })
-        .catch(error => {
-            console.error('Error al actualizar el producto:', error);
-            Swal.fire({
-                title: 'Error',
-                text: 'Hubo un problema al actualizar el producto.',
-                icon: 'error',
-                confirmButtonText: 'OK',
-                customClass: {
-                    confirmButton: 'swal2-confirm'
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSuccessMessage(event, 'editPopup', 'editForm', 'Producto actualizado con éxito');
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
                 }
+            })
+            .catch(error => {
+                console.error('Error al actualizar el producto:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Hubo un problema al actualizar el producto.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'swal2-confirm'
+                    }
+                });
             });
-        });
-    }
+        }
 
         function showSuccessMessage(event, popupId, formId, message) {
             event.preventDefault();
@@ -596,6 +516,7 @@
                 }
             });
         }
+
         function confirmUnarchive(event, productId) {
             event.preventDefault();
             Swal.fire({
@@ -622,8 +543,6 @@
                 }
             });
         }
-
-
     </script>
 </body>
 </html>
