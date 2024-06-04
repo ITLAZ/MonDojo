@@ -112,7 +112,7 @@ form {
 
 .reservation-info {
     display: grid;
-    grid-template-columns: 3fr;
+    grid-template-columns: 1fr;
     gap: 5px;
     width: 100%;
 
@@ -160,7 +160,7 @@ button:hover {
         display: flex;
         flex-direction: column; 
         position: fixed;
-        top: 90px; 
+        top: 70px; 
         right: 0; 
         width: 70%;
         max-width: 300px; 
@@ -188,5 +188,14 @@ button:hover {
     .navbar-right a:hover {
         background-color: #d48600;
         border-radius: 25px; 
+    }
+
+    .form-section {
+        width: 90%;
+        margin-top: 90px;
+    }
+
+    .reservation-info {
+        grid-template-columns: 1fr;
     }
 }

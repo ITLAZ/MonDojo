@@ -186,3 +186,36 @@ h2 {
     justify-content: flex-end;
     margin-top: 20px;
 }
+
+/* Responsivo para el pop-up del carrito */
+@media screen and (max-width: 768px) {
+    .popup-content {
+        width: 95%;
+        padding: 10px;
+    }
+
+    .cart-table th,
+    .cart-table td {
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    .item-info h3 {
+        font-size: 14px;
+    }
+
+    .item-info p {
+        font-size: 12px;
+    }
+
+    .subtotal p,
+    .total-price {
+        font-size: 20px;
+    }
+
+    .checkout-btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+    }
+}

@@ -86,6 +86,9 @@
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
+        <div class="nav-hamburger">
+            <i class="fa fa-bars"></i>
+        </div>
         <ul class="nav-items">
             <li><a href="adminpanel.html">Inicio</a></li>
             <li><a href="userspanel.html">Usuarios</a></li>
@@ -168,6 +171,12 @@
                 const idReserva = this.getAttribute('data-id');
                 window.location.href = `verDetalle-reserva.html?id=${idReserva}`;
             });
+        });
+    </script>
+    <!-- Script Responsive Navbar -->
+    <script>
+        document.querySelector('.nav-hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-items').classList.toggle('nav-items-active');
         });
     </script>
 </body>

@@ -6,11 +6,41 @@
     <link rel="stylesheet" href="../static/css/userforms.css">
     <link rel="stylesheet" href="../static/css/perfil_usuario.css">
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+    <style>
+        .change-password-btn {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px 20px;
+            background-color: #192847;
+            color: #faf7e6;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            text-align: center; /* Asegura que el texto esté centrado */
+        }
+
+        .change-password-btn i {
+            margin-right: 10px;
+        }
+
+        /* Ajustes adicionales para el texto del botón */
+        .change-password-btn span {
+            display: block; /* Asegura que el texto esté en bloque y no cause problemas de alineación */
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <div class="nav-hamburger">
+            <i class="fa fa-bars"></i>
         </div>
         <ul class="nav-items">
             <li><a href="/templates/adminpanel.html">Inicio</a></li>
@@ -50,9 +80,11 @@
                     </div>
                 </div>
                 <div class="input-container">
-                    <label for="password">Restablecer Contraseña</label>
+                    <label for="password"> Restablecer Contraseña</label>
                     <div class="input-with-icon change-password-container">
-                        <button type="button" class="btn change-password-btn" onclick="window.location.href='/reset_password'">🔏ㅤㅤ </button>
+                        <button type="button" class="btn change-password-btn" onclick="window.location.href='/reset_password'">
+                            <i class="fas fa-lock"></i> <span>Restablecer Contraseña</span>
+                        </button>
                     </div>
                 </div>
                 <div class="button-container">
@@ -102,6 +134,12 @@
                     event.preventDefault(); // Solo evita el envío si hay un error
                 }
             });
+        });
+    </script>
+    <!-- Script Responsive Navbar -->
+    <script>
+        document.querySelector('.nav-hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-items').classList.toggle('nav-items-active');
         });
     </script>
 </body>
