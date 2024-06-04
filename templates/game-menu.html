@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Menu de Juegos</title>
     <link rel="stylesheet" href="../static/css/game-menu.css">
+    <link rel="stylesheet" href="../static/css/popup_carrito.css">
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
 </head>
 
@@ -22,6 +23,7 @@
             <a href="#menu">Menú</a>
             <a href="#order">Ubicación</a>
             <a href="/login">Iniciar Sesión</a>
+            <a href="#" id="cart-icon"><i class="fas fa-shopping-cart"></i></a> <!-- Ícono del carrito de compras -->
         </div>
     </div>
     <div class="container">
@@ -66,7 +68,7 @@
                             <span>1 jugador</span>
                         </li>
                     </ul>
-                    <a href="">Solicitar</a>
+                    <a href="#">Solicitar</a>
                 </div>
             </div>
             <div class="game-card">
@@ -84,7 +86,7 @@
                             <span>1 jugador</span>
                         </li>
                     </ul>
-                    <a href="">Solicitar</a>
+                    <a href="#">Solicitar</a>
                 </div>
             </div>
             <div class="game-card">
@@ -102,7 +104,7 @@
                             <span>1 jugador</span>
                         </li>
                     </ul>
-                    <a href="">Solicitar</a>
+                    <a href="#">Solicitar</a>
                 </div>
             </div>
             <div class="game-card">
@@ -120,7 +122,7 @@
                             <span>1 jugador</span>
                         </li>
                     </ul>
-                    <a href="">Solicitar</a>
+                    <a href="#">Solicitar</a>
                 </div>
             </div>
             <div class="game-card">
@@ -138,11 +140,101 @@
                             <span>1 jugador</span>
                         </li>
                     </ul>
-                    <a href="">Solicitar</a>
+                    <a href="#">Solicitar</a>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Pop-up del carrito de compras -->
+    <div class="popup" id="shoppingCartPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup()">&times;</span>
+            <h2>Carrito de compras 🛒</h2>
+            <a href="#" class="remove-all">Remover todo</a>
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Quitar</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="cart-item">
+                        <td>
+                            <div class="item-details">
+                                <img src="../static/images/food3.jpg" alt="Pasta Fettucinne" class="item-image">
+                                <div class="item-info">
+                                    <h3>Pasta Fettucinne</h3>
+                                    <p>Plato</p>
+                                    <span class="veg-icon"></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="item-quantity">
+                                <button class="quantity-btn">+</button>
+                                <span class="quantity">2</span>
+                                <button class="quantity-btn">-</button>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="#" class="remove">Quitar</a>
+                        </td>
+                        <td>
+                            <p>15 Bs.</p>
+                        </td>
+                    </tr>
+                    <tr class="cart-item">
+                        <td>
+                            <div class="item-details">
+                                <img src="../static/images/food2.jpg" alt="Tiramisú" class="item-image">
+                                <div class="item-info">
+                                    <h3>Tiramisú</h3>
+                                    <p>1 porción</p>
+                                    <span class="veg-icon"></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="item-quantity">
+                                <button class="quantity-btn">+</button>
+                                <span class="quantity">1</span>
+                                <button class="quantity-btn">-</button>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="#" class="remove">Quitar</a>
+                        </td>
+                        <td>
+                            <p>30 Bs.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="subtotal">
+                <p>Sub-Total</p>
+                <span class="items-count">2 Productos</span>
+                <span class="total-price">45 Bs.</span>
+            </div>
+            <div class="button-container">
+                <button class="checkout-btn">Pedir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('cart-icon').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('shoppingCartPopup').style.display = 'block';
+        });
+
+        function closePopup() {
+            document.getElementById('shoppingCartPopup').style.display = 'none';
+        }
+    </script>
 </body>
 
 </html>

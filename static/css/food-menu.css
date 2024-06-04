@@ -1,10 +1,10 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body{
+body {
     height: 100%;
     width: 100%;
     font-family: 'Poppins', sans-serif;
@@ -86,7 +86,7 @@ body{
     margin-top: 60px;
 }
 
-.menu-section{
+.menu-section {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -95,7 +95,7 @@ body{
     width: 100%;
 }
 
-.menu-category{
+.menu-category {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -107,7 +107,7 @@ body{
     margin: 10px;
 }
 
-.menu-items{
+.menu-items {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     justify-content: center;
@@ -116,7 +116,7 @@ body{
     margin-top: 20px;
 }
 
-.menu-item{
+.menu-item {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -126,36 +126,36 @@ body{
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     margin: 10px;
+}
 
-    img{
-        width: 100%;
-        height: auto;
-        border-radius: 25px;
-    }   
+.menu-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 25px;
+}
 
-    h3{
-        margin-top: 10px;
-    }
+.menu-item h3 {
+    margin-top: 10px;
+}
 
-    p{
-        margin-top: 10px;
-    }
+.menu-item p {
+    margin-top: 10px;
+}
 
-    button{
-        margin-top: 10px;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 25px;
-        background-color: #d48600;
-        color: #faf7e6;
-        font-weight: bold;
-        cursor: pointer;
-    }
+.menu-item button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    background-color: #d48600;
+    color: #faf7e6;
+    font-weight: bold;
+    cursor: pointer;
+}
 
-    button:hover{
-        background-color: #192847;
-        color: #d48600;
-    }
+.menu-item button:hover {
+    background-color: #192847;
+    color: #d48600;
 }
 
 /* RESPONSIVE PARA MOBILE*/
