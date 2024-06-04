@@ -7,7 +7,7 @@ from .models import Usuario, RegistroActividad
 from sqlalchemy.exc import SQLAlchemyError
 from flask import redirect, url_for, flash
 from flask_dance.contrib.google import google
-from .models import Usuario, CategoriaProducto, Producto
+from .models import Usuario, CategoriaProducto, Producto, CategoriaJuego, Juego
 import datetime
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_login import login_required as flask_login_required
@@ -602,7 +602,193 @@ def unarchive_producto(producto_id):
     return redirect(url_for('food_panel'))
 #-----------------------------------------------------------------
 
+#-----------------productos - vista ADMIN-----------------------
+# Configuración para subir archivos
+UPLOAD_FOLDER2 = 'static/uploads/games'
+ALLOWED_EXTENSIONS2 = {'png', 'jpg', 'jpeg'}
+app.config['UPLOAD_FOLDER2'] = UPLOAD_FOLDER2
 
+# Crear el directorio de subida si no existe
+if not os.path.exists(UPLOAD_FOLDER2):
+    os.makedirs(UPLOAD_FOLDER2)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS2
+
+# Ruta para registrar una nueva categoría
+@app.route('/add_categoryGame', methods=['POST'])
+@login_required
+def add_categoryGame():
+    nombre_categoria = request.form.get('nombre')
+    
+    if not nombre_categoria:
+        flash('El nombre de la categoría es obligatorio.', 'error')
+        return redirect(url_for('game_panel'))
+
+    nueva_categoria = CategoriaJuego(nombre=nombre_categoria)
+    
+    try:
+        db.session.add(nueva_categoria)
+        db.session.commit()
+        flash('Categoría registrada con éxito.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al registrar la categoría: ' + str(e), 'error')
+
+    return redirect(url_for('game_panel'))
+
+
+# Ruta para renderizar el panel de juegos
+@app.route('/game_panel', methods=['GET'])
+@login_required
+def game_panel():
+    search_query = request.args.get('search', '').strip()
+    sort_by = request.args.get('sort_by', 'nombre')
+    sort_order = request.args.get('sort_order', 'asc')
+    group_by = request.args.get('group_by', '')
+
+    query = Juego.query
+
+    if search_query:
+        query = query.filter(Juego.nombre.ilike(f"%{search_query}%"))
+
+    if group_by == "archivados":
+        query = query.filter(Juego.activo == False)
+    elif group_by:
+        query = query.filter(Juego.categoria_juego_id_catJuego == group_by)
+    else:
+        query = query.filter((Juego.activo == True) | (Juego.activo == None))
+
+    if sort_by and sort_order:
+        if sort_order == 'asc':
+            query = query.order_by(getattr(Juego, sort_by).asc())
+        else:
+            query = query.order_by(getattr(Juego, sort_by).desc())
+
+    juegos = query.all()
+    categorias = CategoriaJuego.query.all()
+
+    return render_template('games-panel.html', juegos=juegos, categorias=categorias, selected_category=group_by)
+
+# Ruta para agregar un nuevo juego
+@app.route('/add_game', methods=['POST'])
+@login_required
+def add_game():
+    nombre = request.form.get('nombre')
+    descripcion = request.form.get('descripcion')
+    precio_alquiler = request.form.get('precio_alquiler')
+    precio_venta = request.form.get('precio_venta')
+    disponible_venta = request.form.get('disponible_venta') == 'on'
+    categoria_id = request.form.get('categoria')
+    imagen = request.files.get('imagen')
+
+    if not nombre or not descripcion or not precio_alquiler or not precio_venta or not categoria_id or not imagen:
+        flash('Todos los campos son obligatorios.', 'error')
+        return redirect(url_for('game_panel'))
+
+    if not allowed_file(imagen.filename):
+        flash('Solo se permiten archivos de imagen con extensión .png, .jpg, .jpeg.', 'error')
+        return redirect(url_for('game_panel'))
+
+    # Guardar la imagen
+    filename = secure_filename(imagen.filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER2'], filename)
+    imagen.save(filepath)
+
+    nuevo_game = Juego(
+        nombre=nombre,
+        descripcion=descripcion,
+        precio_alquiler=float(precio_alquiler),
+        precio_venta=float(precio_venta),
+        disponible_venta=disponible_venta,
+        imagen=filepath,
+        categoria_juego_id_catJuego=int(categoria_id),
+        activo=True  # Establecer el juego como activo
+    )
+    try:
+        db.session.add(nuevo_game)
+        db.session.commit()
+        flash('Juego registrado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al registrar el juego: ' + str(e), 'error')
+
+    return redirect(url_for('game_panel'))
+
+# Ruta para obtener la información de un juego específico
+@app.route('/get_game/<int:juego_id>')
+@login_required
+def get_game(juego_id):
+    juego = Juego.query.get_or_404(juego_id)
+    return jsonify({
+        'nombre': juego.nombre,
+        'descripcion': juego.descripcion,
+        'precio_alquiler': juego.precio_alquiler,
+        'precio_venta': juego.precio_venta,
+        'disponible_venta': juego.disponible_venta,
+        'categoria_juego_id_catJuego': juego.categoria_juego_id_catJuego
+    })
+
+# Ruta para actualizar un juego
+@app.route('/update_game/<int:game_id>', methods=['POST'])
+@login_required
+def update_game(game_id):
+    game = Juego.query.get_or_404(game_id)
+
+    game.nombre = request.form.get('nombre')
+    game.descripcion = request.form.get('descripcion')
+    game.precio_alquiler = float(request.form.get('precio_alquiler'))
+    game.precio_venta = float(request.form.get('precio_venta'))
+    game.disponible_venta = request.form.get('disponible_venta') == 'on'
+    game.categoria_juego_id_catJuego = int(request.form.get('categoria'))
+
+    imagen = request.files.get('imagen')
+    if imagen and allowed_file(imagen.filename):
+        # Guardar la nueva imagen
+        filename = secure_filename(imagen.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER2'], filename)
+        imagen.save(filepath)
+        game.imagen = filepath
+
+    try:
+        db.session.commit()
+        flash('Juego actualizado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al actualizar el juego: ' + str(e), 'error')
+
+    return redirect(url_for('game_panel'))
+
+
+# Ruta para eliminar un juego de manera lógica (archivar)
+@app.route('/delete_game/<int:juego_id>', methods=['POST'])
+@login_required
+def delete_game(juego_id):
+    juego = Juego.query.get_or_404(juego_id)
+    juego.activo = False  # Baja lógica
+    try:
+        db.session.commit()
+        flash('Juego archivado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al archivar el juego: ' + str(e), 'error')
+    
+    return redirect(url_for('game_panel'))
+
+# Desarchivar un juego
+@app.route('/unarchive_game/<int:juego_id>', methods=['POST'])
+@login_required
+def unarchive_game(juego_id):
+    juego = Juego.query.get_or_404(juego_id)
+    juego.activo = True
+    try:
+        db.session.commit()
+        flash('Juego desarchivado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al desarchivar el juego: ' + str(e), 'error')
+    
+    return redirect(url_for('game_panel'))
 
 
 
