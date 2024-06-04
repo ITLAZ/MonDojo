@@ -13,6 +13,7 @@ class Usuario(db.Model,UserMixin):
     is_active = db.Column(db.Boolean, default=True)
     pregunta_seguridad = db.Column(db.String(255), nullable=False)
     respuesta_seguridad = db.Column(db.String(255), nullable=False)
+    activo = db.Column(db.Boolean, default=True)
     rol_id_rol = db.Column(db.String(50), db.ForeignKey('rol.id_rol'), nullable=False)
     pagos = db.relationship('Pago', backref='usuario', lazy=True)
     registros_juego = db.relationship('RegistroJuego', backref='usuario', lazy=True)
@@ -66,6 +67,8 @@ class Mesa(db.Model):
     id_mesa = db.Column(db.Integer, primary_key=True)
     capacidad = db.Column(db.Integer, nullable=False)
     ubicacion = db.Column(db.String(200), nullable=False)
+    activo = db.Column(db.Boolean, default=True)
+
 
 class Pedido(db.Model):
     __tablename__ = 'pedido'

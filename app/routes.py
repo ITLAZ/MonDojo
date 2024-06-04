@@ -7,7 +7,7 @@ from .models import Usuario, RegistroActividad
 from sqlalchemy.exc import SQLAlchemyError
 from flask import redirect, url_for, flash
 from flask_dance.contrib.google import google
-from .models import Usuario, CategoriaProducto, Producto, CategoriaJuego, Juego
+from .models import Usuario, CategoriaProducto, Producto, CategoriaJuego, Juego, Mesa
 import datetime
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_login import login_required as flask_login_required
@@ -602,7 +602,7 @@ def unarchive_producto(producto_id):
     return redirect(url_for('food_panel'))
 #-----------------------------------------------------------------
 
-#-----------------productos - vista ADMIN-----------------------
+#-----------------juegos - vista ADMIN-----------------------
 # Configuración para subir archivos
 UPLOAD_FOLDER2 = 'static/uploads/games'
 ALLOWED_EXTENSIONS2 = {'png', 'jpg', 'jpeg'}
@@ -789,9 +789,122 @@ def unarchive_game(juego_id):
         flash('Error al desarchivar el juego: ' + str(e), 'error')
     
     return redirect(url_for('game_panel'))
+#--------------------------------------------------------------------
+#------------------REGISTRO MESA - admin ---------------------------
+
+# Ruta para renderizar el panel de productos/comida
+@app.route('/registro_mesa', methods=['GET'])
+@login_required
+def registro_mesa():
+    search_query = request.args.get('search', '').strip()
+    sort_by = request.args.get('sort_by', 'ubicacion')
+    sort_order = request.args.get('sort_order', 'asc')
+    group_by = request.args.get('group_by', '')
+
+    query = Mesa.query
+
+    if search_query:
+        query = query.filter(Mesa.ubicacion.ilike(f"%{search_query}%"))
+
+    if group_by == "archivados":
+        query = query.filter(Mesa.activo == False)
+    else:
+        query = query.filter((Mesa.activo == True) | (Mesa.activo == None))
+
+    if sort_by and sort_order:
+        if sort_order == 'asc':
+            query = query.order_by(getattr(Mesa, sort_by).asc())
+        else:
+            query = query.order_by(getattr(Mesa, sort_by).desc())
+
+    mesas = query.all()
+
+    return render_template('registrar-mesas.html', mesas=mesas, selected_mesa=group_by)
 
 
+#agregar un nuevo producto
+@app.route('/add_mesa', methods=['POST'])
+@login_required
+def add_mesa():
+    capacidad = request.form.get('capacidad')
+    ubicacion = request.form.get('ubicacion')
 
+    if not capacidad or not ubicacion:
+        flash('Todos los campos son obligatorios.', 'error')
+        return redirect(url_for('registro_mesa'))
+
+    nuevo_mesa = Mesa(
+        capacidad=int(capacidad),
+        ubicacion=ubicacion,
+        activo=True  # Establecer el producto como activo
+    )
+    try:
+        db.session.add(nuevo_mesa)
+        db.session.commit()
+        flash('mesa registrado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al registrar el producto: ' + str(e), 'error')
+
+    return redirect(url_for('registro_mesa'))
+
+# Ruta para obtener la información de un producto específico
+@app.route('/get_mesa/<int:mesa_id>')
+@login_required
+def get_mesa(mesa_id):
+    mesa = Mesa.query.get_or_404(mesa_id)
+    return jsonify({
+        'capacidad': mesa.capacidad,
+        'ubicacion': mesa.ubicacion,
+    })
+
+# Ruta para actualizar un producto
+@app.route('/update_mesa/<int:mesa_id>', methods=['POST'])
+@login_required
+def update_mesa(mesa_id):
+    mesa = Mesa.query.get_or_404(mesa_id)
+
+    mesa.capacidad = int(request.form.get('capacidad'))
+    mesa.ubicacion = request.form.get('ubicacion')
+
+    try:
+        db.session.commit()
+        flash('Producto actualizado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al actualizar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('registro_mesa'))
+
+#ruta para eliminar un producto de manera logica(arhivar)
+@app.route('/delete_mesa/<int:mesa_id>', methods=['POST'])
+@login_required
+def delete_mesa(mesa_id):
+    mesa = Mesa.query.get_or_404(mesa_id)
+    mesa.activo = False  # Baja lógica
+    try:
+        db.session.commit()
+        flash('Producto eliminado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al eliminar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('registro_mesa'))
+
+# desarchivar un producto
+@app.route('/unarchive_mesa/<int:mesa_id>', methods=['POST'])
+@login_required
+def unarchive_mesa(mesa_id):
+    mesa = Mesa.query.get_or_404(mesa_id)
+    mesa.activo = True
+    try:
+        db.session.commit()
+        flash('Producto desarchivado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al desarchivar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('registro_mesa'))
 
 
 
