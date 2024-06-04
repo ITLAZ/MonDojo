@@ -27,122 +27,48 @@
         </div>
     </div>
     <div class="container">
-        <div class="filters">
-            <div class="filter-option">
-                <label for="category">Categoría:</label>
-                <select name="category" id="category">
-                    <option value="all">Todos</option>
-                    <option value="action">Acción</option>
-                    <option value="adventure">Aventura</option>
-                    <option value="puzzle">Rompecabezas</option>
-                    <option value="strategy">Estrategia</option>
-                </select>
+
+        
+        <form method="GET" action="/game-menu">
+            <div class="filters">
+                <div class="filter-option">
+                    <label for="category">Categoría:</label>
+                    <select name="category" id="category" onchange="this.form.submit()">
+                        <option value="all" {% if categoria_filtro == 'all' %}selected{% endif %}>Todos</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.nombre }}" {% if categoria_filtro == categoria.nombre %}selected{% endif %}>{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-option">
+                    <label for="search">Buscar un juego:</label>
+                    <input id="search" class="search-bar" name="search" type="text" placeholder="Ingrese el nombre del juego..." value="{{ search_query }}">
+                </div>
             </div>
-            <div class="filter-option">
-                <label for="players">Jugadores:</label>
-                <select name="players" id="players">
-                    <option value="single">1 jugador</option>
-                    <option value="duo">2 jugadores</option>
-                    <option value="multiplayer">3 - 5 jugadores</option>
-                    <option value="party">6 - 10 jugadores</option>
-                </select>
-            </div>
-            <div class="filter-option">
-                <label for="search">Buscar un juego:</label>
-                <input id="search" class="search-bar" type="text" placeholder="Ingrese el nombre del juego...">
-            </div>
-        </div>
+        </form>
+
+
+
         <div class="game-menu">
+            {% for juego in juegos %}
             <div class="game-card">
-                <img src="../static/images/games/game1.jpg" alt="Game 1">
+                <img src="{{ juego.imagen }}" alt="Imagen de {{ juego.nombre }}" width="100">
                 <div class="game-info">
-                    <h3>Game 1</h3>
-                    <p>Descripción del juego 1</p>
+                    <h3>{{ juego.nombre }}</h3>
+                    <p>{{ juego.descripcion }}</p>
                     <ul class="tags">
                         <li>
                             <i class="fas fa-gamepad"></i>
-                            <span>Acción</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-users"></i>
-                            <span>1 jugador</span>
+                            <span>{{ juego.categoria_juego.nombre }}</span>
                         </li>
                     </ul>
                     <a href="#">Solicitar</a>
                 </div>
             </div>
-            <div class="game-card">
-                <img src="../static/images/games/game1.jpg" alt="Game 1">
-                <div class="game-info">
-                    <h3>Game 1</h3>
-                    <p>Descripción del juego 1</p>
-                    <ul class="tags">
-                        <li>
-                            <i class="fas fa-gamepad"></i>
-                            <span>Acción</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-users"></i>
-                            <span>1 jugador</span>
-                        </li>
-                    </ul>
-                    <a href="#">Solicitar</a>
-                </div>
-            </div>
-            <div class="game-card">
-                <img src="../static/images/games/game1.jpg" alt="Game 1">
-                <div class="game-info">
-                    <h3>Game 1</h3>
-                    <p>Descripción del juego 1</p>
-                    <ul class="tags">
-                        <li>
-                            <i class="fas fa-gamepad"></i>
-                            <span>Acción</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-users"></i>
-                            <span>1 jugador</span>
-                        </li>
-                    </ul>
-                    <a href="#">Solicitar</a>
-                </div>
-            </div>
-            <div class="game-card">
-                <img src="../static/images/games/game1.jpg" alt="Game 1">
-                <div class="game-info">
-                    <h3>Game 1</h3>
-                    <p>Descripción del juego 1</p>
-                    <ul class="tags">
-                        <li>
-                            <i class="fas fa-gamepad"></i>
-                            <span>Acción</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-users"></i>
-                            <span>1 jugador</span>
-                        </li>
-                    </ul>
-                    <a href="#">Solicitar</a>
-                </div>
-            </div>
-            <div class="game-card">
-                <img src="../static/images/games/game1.jpg" alt="Game 1">
-                <div class="game-info">
-                    <h3>Game 1</h3>
-                    <p>Descripción del juego 1</p>
-                    <ul class="tags">
-                        <li>
-                            <i class="fas fa-gamepad"></i>
-                            <span>Acción</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-users"></i>
-                            <span>1 jugador</span>
-                        </li>
-                    </ul>
-                    <a href="#">Solicitar</a>
-                </div>
-            </div>
+        {% endfor %}
+ 
+            
         </div>
     </div>
 

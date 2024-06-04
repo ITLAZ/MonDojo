@@ -789,6 +789,48 @@ def unarchive_game(juego_id):
         flash('Error al desarchivar el juego: ' + str(e), 'error')
     
     return redirect(url_for('game_panel'))
+
+
+
+#mostrar categorias y productos vista usuario 
+@app.route('/food-menu')
+@login_required
+def mostrar_menu():
+    categorias = db.session.query(CategoriaProducto).all()
+    productos = db.session.query(Producto).filter_by(activo=True).all()
+
+    # Agrupar productos por categoría
+    productos_por_categoria = {}
+    for producto in productos:
+        categoria_id = producto.categoria_producto_id_catProducto
+        if categoria_id not in productos_por_categoria:
+            productos_por_categoria[categoria_id] = []
+        productos_por_categoria[categoria_id].append(producto)
+
+    return render_template('food-menu.html', categorias=categorias, productos_por_categoria=productos_por_categoria)
+
+
+
+#mostrar categorias y juegos 
+@app.route('/game-menu')
+@login_required
+def mostrar_menu_juegos():
+    categoria_filtro = request.args.get('category', 'all')
+    search_query = request.args.get('search', '')
+
+    categorias = db.session.query(CategoriaJuego).all()
+    query = db.session.query(Juego).filter_by(activo=True)
+
+    if categoria_filtro != 'all':
+        categoria = db.session.query(CategoriaJuego).filter_by(nombre=categoria_filtro).first()
+        if categoria:
+            query = query.filter_by(categoria_juego_id_catJuego=categoria.id_catJuego)
+
+    if search_query:
+        query = query.filter(Juego.nombre.ilike(f'%{search_query}%'))
+
+    juegos = query.all()
+    return render_template('game-menu.html', juegos=juegos, categorias=categorias, categoria_filtro=categoria_filtro, search_query=search_query)
 #--------------------------------------------------------------------
 #------------------REGISTRO MESA - admin ---------------------------
 
