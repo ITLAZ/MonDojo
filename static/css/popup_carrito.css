@@ -3,9 +3,9 @@ body {
 }
 
 .popup {
-    display: block; /* Cambia a 'none' para ocultar inicialmente */
+    display: none; /* Cambia a 'block' solo para pruebas, vuelve a 'none' para producción */
     position: fixed;
-    top: 0;
+    top: 50px; /* Ajusta esta distancia según el tamaño de tu navbar */
     left: 0;
     width: 100%;
     height: 100%;
