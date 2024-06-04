@@ -50,6 +50,7 @@
         }
 
         .search-container button,
+        .group-by-container button,
         .add-buttons button {
             margin-left: 10px;
             margin-right: 10px;
@@ -73,17 +74,8 @@
             margin-left: 10px;
             margin-right: 10px;
         }
-
-        #addProductBtn {
-            width: 250px; /* Hacer el botón más ancho */
-        }
-        .title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        group-by-container {
+        
+        .group-by-container {
             display: flex;
             justify-content: flex-start;            
             align-items: center;
@@ -106,6 +98,9 @@
     <nav class="navbar">
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <div class="nav-hamburger">
+            <i class="fa fa-bars"></i>
         </div>
         <ul class="nav-items">
             <li><a href="/adminpanel">Inicio</a></li>
@@ -422,6 +417,12 @@
                 }
             });
         }
+    </script>
+    <!-- Script Responsive Navbar -->
+    <script>
+        document.querySelector('.nav-hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-items').classList.toggle('nav-items-active');
+        });
     </script>
 </body>
 </html>
