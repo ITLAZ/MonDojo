@@ -1,3 +1,4 @@
+/* Estilos generales */
 * {
     margin: 0;
     padding: 0;
@@ -115,19 +116,19 @@ form {
     grid-template-columns: 1fr;
     gap: 5px;
     width: 100%;
+}
 
-    label {
-        font-weight: bold;
-        justify-content: center;
-        align-self: center;
-    }
+label {
+    font-weight: bold;
+    justify-content: center;
+    align-self: center;
+}
 
-    input {
-        width: 100%;
-        padding: 10px;
-        border-radius: 25px;
-        border: 1px solid #192847;
-    }
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 25px;
+    border: 1px solid #192847;
 }
 
 button {
@@ -148,6 +149,198 @@ button:hover {
     background-color: #FAF7E6;
     color: #192847;
     border: #192847 2px solid;
+}
+
+.hidden {
+    display: none;
+}
+
+.custom-checkbox {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #1c1c1c;
+    border: 2px solid #d48600;
+    border-radius: 5px;
+    position: relative;
+    cursor: pointer;
+}
+
+.custom-checkbox input {
+    display: none;
+}
+
+.custom-checkbox input:checked + .checkmark::after {
+    content: '✔';
+    color: #d48600;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+}
+
+.checkmark {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Estilos para el Pop-up */
+.popup {
+    display: none; /* Ocultar el pop-up inicialmente */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.popup-content {
+    position: relative;
+    margin: 5% auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    background-color: #FAF7E6;
+    border-radius: 10px;
+    text-align: left;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #192847;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #d48600;
+    text-align: center;
+}
+
+/* Estilos para los inputs y botones */
+.reservation-info input, .categoria-section select, .productos-section input, .juegos-section input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 25px;
+    border: 1px solid #192847;
+    margin-top: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.reservation-info input:hover, .categoria-section select:hover, .productos-section input:hover, .juegos-section input:hover {
+    background-color: #d48600;
+    color: #192847;
+}
+
+.confirm-btn, .btn {
+    background-color: #192847;
+    color: #FAF7E6;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    display: block;
+    width: 30%;
+    text-align: center;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.confirm-btn:hover, .btn:hover {
+    background-color: #d48600;
+    color: #192847;
+    border: 1px solid #192847;
+}
+
+.mesas-section ul, .productos-section ul, .juegos-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.mesas-section li, .productos-section li, .juegos-section li {
+    margin-bottom: 10px;
+}
+
+.mesas-section input[type="radio"], .productos-section input[type="checkbox"], .juegos-section input[type="radio"] {
+    margin-right: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #192847;
+    color: #FAF7E6;
+}
+
+td img {
+    width: 50px;
+}
+
+/* Estilos para el Pop-up de ayuda */
+.help-popup {
+    display: none; /* Ocultar el pop-up inicialmente */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.help-popup-content {
+    position: relative;
+    margin: 5% auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    background-color: #FAF7E6;
+    border-radius: 10px;
+    text-align: left;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.help-popup .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #192847;
+}
+
+.help-popup h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #d48600;
+    text-align: center;
+}
+
+.help-popup ol {
+    padding-left: 20px;
+    color: #192847;
+}
+
+.help-popup ol li {
+    margin-bottom: 10px;
 }
 
 /* RESPONSIVE PARA MOBILE*/
@@ -197,5 +390,9 @@ button:hover {
 
     .reservation-info {
         grid-template-columns: 1fr;
+    }
+
+    .popup-content, .help-popup-content {
+        width: 90%;
     }
 }
