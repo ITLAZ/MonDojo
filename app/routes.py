@@ -7,11 +7,13 @@ from .models import Usuario, RegistroActividad
 from sqlalchemy.exc import SQLAlchemyError
 from flask import redirect, url_for, flash
 from flask_dance.contrib.google import google
-from .models import Usuario, CategoriaProducto, Producto, CategoriaJuego, Juego
+from .models import Usuario, CategoriaProducto, Producto, CategoriaJuego, Juego, Mesa, Reserva, DetalleReserva, RegistroJuego
 import datetime
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_login import login_required as flask_login_required
 from datetime import datetime as dt
+from datetime import datetime, timedelta
+
 from flask import jsonify  
 from werkzeug.utils import secure_filename
 from sqlalchemy import or_
@@ -602,7 +604,7 @@ def unarchive_producto(producto_id):
     return redirect(url_for('food_panel'))
 #-----------------------------------------------------------------
 
-#-----------------productos - vista ADMIN-----------------------
+#-----------------juegos - vista ADMIN-----------------------
 # Configuración para subir archivos
 UPLOAD_FOLDER2 = 'static/uploads/games'
 ALLOWED_EXTENSIONS2 = {'png', 'jpg', 'jpeg'}
@@ -790,6 +792,438 @@ def unarchive_game(juego_id):
     
     return redirect(url_for('game_panel'))
 
+#-----------------------------ver menus -VISTA USUARIO------------------------------
+
+#mostrar categorias y productos vista usuario 
+@app.route('/food-menu')
+@login_required
+def mostrar_menu():
+    categorias = db.session.query(CategoriaProducto).all()
+    productos = db.session.query(Producto).filter_by(activo=True).all()
+
+    # Agrupar productos por categoría
+    productos_por_categoria = {}
+    for producto in productos:
+        categoria_id = producto.categoria_producto_id_catProducto
+        if categoria_id not in productos_por_categoria:
+            productos_por_categoria[categoria_id] = []
+        productos_por_categoria[categoria_id].append(producto)
+
+    return render_template('food-menu.html', categorias=categorias, productos_por_categoria=productos_por_categoria)
+
+
+
+#mostrar categorias y juegos 
+@app.route('/game-menu')
+@login_required
+def mostrar_menu_juegos():
+    categoria_filtro = request.args.get('category', 'all')
+    search_query = request.args.get('search', '')
+
+    categorias = db.session.query(CategoriaJuego).all()
+    query = db.session.query(Juego).filter_by(activo=True)
+
+    if categoria_filtro != 'all':
+        categoria = db.session.query(CategoriaJuego).filter_by(nombre=categoria_filtro).first()
+        if categoria:
+            query = query.filter_by(categoria_juego_id_catJuego=categoria.id_catJuego)
+
+    if search_query:
+        query = query.filter(Juego.nombre.ilike(f'%{search_query}%'))
+
+    juegos = query.all()
+    return render_template('game-menu.html', juegos=juegos, categorias=categorias, categoria_filtro=categoria_filtro, search_query=search_query)
+#--------------------------------------------------------------------
+#------------------REGISTRO MESA - admin ---------------------------
+
+# Ruta para renderizar el panel de productos/comida
+@app.route('/registro_mesa', methods=['GET'])
+@login_required
+def registro_mesa():
+    search_query = request.args.get('search', '').strip()
+    sort_by = request.args.get('sort_by', 'ubicacion')
+    sort_order = request.args.get('sort_order', 'asc')
+    group_by = request.args.get('group_by', '')
+
+    query = Mesa.query
+
+    if search_query:
+        query = query.filter(Mesa.ubicacion.ilike(f"%{search_query}%"))
+
+    if group_by == "archivados":
+        query = query.filter(Mesa.activo == False)
+    else:
+        query = query.filter((Mesa.activo == True) | (Mesa.activo == None))
+
+    if sort_by and sort_order:
+        if sort_order == 'asc':
+            query = query.order_by(getattr(Mesa, sort_by).asc())
+        else:
+            query = query.order_by(getattr(Mesa, sort_by).desc())
+
+    mesas = query.all()
+
+    return render_template('registrar-mesas.html', mesas=mesas, selected_mesa=group_by)
+
+
+#agregar un nuevo producto
+@app.route('/add_mesa', methods=['POST'])
+@login_required
+def add_mesa():
+    capacidad = request.form.get('capacidad')
+    ubicacion = request.form.get('ubicacion')
+
+    if not capacidad or not ubicacion:
+        flash('Todos los campos son obligatorios.', 'error')
+        return redirect(url_for('registro_mesa'))
+
+    nuevo_mesa = Mesa(
+        capacidad=int(capacidad),
+        ubicacion=ubicacion,
+        activo=True  # Establecer el producto como activo
+    )
+    try:
+        db.session.add(nuevo_mesa)
+        db.session.commit()
+        flash('mesa registrado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al registrar el producto: ' + str(e), 'error')
+
+    return redirect(url_for('registro_mesa'))
+
+# Ruta para obtener la información de un producto específico
+@app.route('/get_mesa/<int:mesa_id>')
+@login_required
+def get_mesa(mesa_id):
+    mesa = Mesa.query.get_or_404(mesa_id)
+    return jsonify({
+        'capacidad': mesa.capacidad,
+        'ubicacion': mesa.ubicacion,
+    })
+
+# Ruta para actualizar un producto
+@app.route('/update_mesa/<int:mesa_id>', methods=['POST'])
+@login_required
+def update_mesa(mesa_id):
+    mesa = Mesa.query.get_or_404(mesa_id)
+
+    mesa.capacidad = int(request.form.get('capacidad'))
+    mesa.ubicacion = request.form.get('ubicacion')
+
+    try:
+        db.session.commit()
+        flash('Producto actualizado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al actualizar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('registro_mesa'))
+
+#ruta para eliminar un producto de manera logica(arhivar)
+@app.route('/delete_mesa/<int:mesa_id>', methods=['POST'])
+@login_required
+def delete_mesa(mesa_id):
+    mesa = Mesa.query.get_or_404(mesa_id)
+    mesa.activo = False  # Baja lógica
+    try:
+        db.session.commit()
+        flash('Producto eliminado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al eliminar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('registro_mesa'))
+
+# desarchivar un producto
+@app.route('/unarchive_mesa/<int:mesa_id>', methods=['POST'])
+@login_required
+def unarchive_mesa(mesa_id):
+    mesa = Mesa.query.get_or_404(mesa_id)
+    mesa.activo = True
+    try:
+        db.session.commit()
+        flash('Producto desarchivado exitosamente.', 'success')
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash('Error al desarchivar el producto: ' + str(e), 'error')
+    
+    return redirect(url_for('registro_mesa'))
+
+
+@app.route('/form_reserva')
+@login_required
+def form_reserva():
+    return render_template('form-reserva.html')
+
+@app.route('/continuar_reserva', methods=['GET'])
+@login_required
+def continuar_reserva():
+    fecha = request.args.get('date')
+    hora_inicio = request.args.get('start_time')
+    hora_fin = request.args.get('end_time')
+    usuario_id = current_user.id_usuario
+
+    # Verificar si el usuario ya tiene una reserva en la misma fecha
+    reservas_usuario = Reserva.query.filter_by(usuario_id_usuario=usuario_id).all()
+    for reserva in reservas_usuario:
+        if reserva.fecha_hora.date() == datetime.strptime(fecha, '%Y-%m-%d').date():
+            flash('Elige otra fecha, ya tienes una reserva en esta fecha', 'error')
+            return redirect(url_for('form_reserva'))
+
+    fecha_hora_inicio = datetime.strptime(f'{fecha} {hora_inicio}', '%Y-%m-%d %H:%M')
+    fecha_hora_fin = datetime.strptime(f'{fecha} {hora_fin}', '%Y-%m-%d %H:%M')
+
+    mesas_disponibles = []
+    mesas = Mesa.query.all()
+    for mesa in mesas:
+        reservas = Reserva.query.filter(
+            Reserva.mesa_id_mesa == mesa.id_mesa,
+            Reserva.fecha_hora.between(fecha_hora_inicio, fecha_hora_fin)
+        ).all()
+        if reservas:
+            proxima_disponibilidad = max([r.fecha_hora for r in reservas]) + timedelta(hours=2, minutes=30)
+            mesas_disponibles.append({
+                'mesa': mesa,
+                'disponible': False,
+                'proxima_disponibilidad': proxima_disponibilidad
+            })
+        else:
+            mesas_disponibles.append({
+                'mesa': mesa,
+                'disponible': True,
+                'proxima_disponibilidad': None
+            })
+
+    categorias_productos = CategoriaProducto.query.all()
+    categorias_juegos = CategoriaJuego.query.all()
+    productos = Producto.query.filter_by(activo=True).all()
+    juegos = Juego.query.filter_by(activo=True).all()
+
+    return render_template('form-reserva.html', 
+                           mesas_disponibles=mesas_disponibles, 
+                           productos=productos, 
+                           juegos=juegos, 
+                           categorias_productos=categorias_productos, 
+                           categorias_juegos=categorias_juegos, 
+                           fecha=fecha, 
+                           hora_inicio=hora_inicio, 
+                           hora_fin=hora_fin)
+
+@app.route('/confirmar_reserva', methods=['POST'])
+@login_required
+def confirmar_reserva():
+    fecha = request.form.get('date')
+    hora_inicio = request.form.get('start_time')
+    hora_fin = request.form.get('end_time')
+    mesa_id = request.form.get('mesa')
+    productos_seleccionados = request.form.get('productos').split(',')
+    juego_seleccionado = request.form.get('juego')
+
+    print("Fecha:", fecha)
+    print("Hora inicio:", hora_inicio)
+    print("Hora fin:", hora_fin)
+    print("Mesa ID:", mesa_id)
+    print("Productos seleccionados:", productos_seleccionados)
+    print("Juego seleccionado:", juego_seleccionado)
+
+    fecha_hora_inicio = datetime.strptime(f'{fecha} {hora_inicio}', '%Y-%m-%d %H:%M')
+
+    try:
+        reserva = Reserva(
+            fecha_hora=fecha_hora_inicio,
+            estado='Reservado',
+            usuario_id_usuario=current_user.id_usuario,
+            mesa_id_mesa=int(mesa_id)
+        )
+        db.session.add(reserva)
+        db.session.commit()
+
+        for producto in productos_seleccionados:
+            if producto:
+                producto_id, cantidad = map(int, producto.split(':'))
+                prod = Producto.query.get(producto_id)
+                detalle_reserva = DetalleReserva(
+                    cantidad=cantidad,
+                    precio=prod.precio,
+                    producto_id_producto=producto_id,
+                    reserva_id_reserva=reserva.id_reserva
+                )
+                db.session.add(detalle_reserva)
+
+        if juego_seleccionado:
+            juego_id, cantidad = map(int, juego_seleccionado.split(':'))
+            juego = Juego.query.get(juego_id)
+            registro_juego = RegistroJuego(
+                cantidad=cantidad,
+                precio=juego.precio_alquiler,
+                tipo=1,  # Asumir un tipo, ya que no está definido en el contexto
+                juego_id_juego=juego_id,
+                usuario_id_usuario=current_user.id_usuario,
+                reserva_id_reserva=reserva.id_reserva
+            )
+            db.session.add(registro_juego)
+
+        db.session.commit()
+        flash('Reserva confirmada con éxito.', 'success')
+        return redirect(url_for('inicio_usuario'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al confirmar la reserva: {str(e)}', 'danger')
+        return redirect(url_for('form_reserva'))
+
+
+@app.route('/user_reservations')
+@login_required
+def user_reservations():
+    group_by = request.args.get('group_by', 'todas')
+
+    query = Reserva.query.filter_by(usuario_id_usuario=current_user.id_usuario)
+
+    if group_by == 'reservados':
+        query = query.filter_by(estado='Reservado')
+    elif group_by == 'cancelado':
+        query = query.filter_by(estado='Cancelado')
+
+    reservas = query.all()
+
+    reservas_info = []
+    for reserva in reservas:
+        detalle_reservas = DetalleReserva.query.filter_by(reserva_id_reserva=reserva.id_reserva).all()
+        registro_juego = RegistroJuego.query.filter_by(reserva_id_reserva=reserva.id_reserva).first()
+
+        monto_total = sum(detalle.cantidad * detalle.precio for detalle in detalle_reservas)
+        if registro_juego:
+            monto_total += registro_juego.cantidad * registro_juego.precio
+
+        reservas_info.append({
+            'id_reserva': reserva.id_reserva,
+            'fecha_hora': reserva.fecha_hora,
+            'estado': reserva.estado,
+            'monto_total': monto_total
+        })
+
+    return render_template('user-reservations.html', reservas=reservas_info, selected_group=group_by)
+
+
+
+
+@app.route('/cancelar_reserva/<int:id_reserva>', methods=['POST'])
+@login_required
+def cancelar_reserva(id_reserva):
+    reserva = Reserva.query.get_or_404(id_reserva)
+    if reserva.usuario_id_usuario != current_user.id_usuario:
+        flash('No tienes permiso para cancelar esta reserva.', 'danger')
+        return redirect(url_for('user_reservations'))
+
+    reserva.estado = 'Cancelado'
+    db.session.commit()
+    flash('Reserva cancelada con éxito.', 'success')
+    return redirect(url_for('user_reservations'))
+from datetime import datetime, timedelta
+
+@app.route('/editar_reserva/<int:reserva_id>', methods=['GET', 'POST'])
+@login_required
+def editar_reserva(reserva_id):
+    if request.method == 'POST':
+        try:
+            productos_seleccionados = request.form.get('productos').split(',')
+            juego_seleccionado = request.form.get('juego')
+
+            reserva = Reserva.query.get(reserva_id)
+            DetalleReserva.query.filter_by(reserva_id_reserva=reserva.id_reserva).delete()
+            RegistroJuego.query.filter_by(reserva_id_reserva=reserva.id_reserva).delete()
+
+            for producto in productos_seleccionados:
+                if producto:
+                    producto_id, cantidad = map(int, producto.split(':'))
+                    prod = Producto.query.get(producto_id)
+                    detalle_reserva = DetalleReserva(
+                        cantidad=cantidad,
+                        precio=prod.precio,
+                        producto_id_producto=producto_id,
+                        reserva_id_reserva=reserva.id_reserva
+                    )
+                    db.session.add(detalle_reserva)
+
+            if juego_seleccionado:
+                juego_id, cantidad = map(int, juego_seleccionado.split(':'))
+                juego = Juego.query.get(juego_id)
+                registro_juego = RegistroJuego(
+                    cantidad=cantidad,
+                    precio=juego.precio_alquiler,
+                    tipo=1,
+                    juego_id_juego=juego_id,
+                    usuario_id_usuario=current_user.id_usuario,
+                    reserva_id_reserva=reserva.id_reserva
+                )
+                db.session.add(registro_juego)
+
+            db.session.commit()
+            flash('Reserva actualizada con éxito.', 'success')
+            return redirect(url_for('user_reservations'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al actualizar la reserva: {str(e)}', 'danger')
+            return redirect(url_for('editar_reserva', reserva_id=reserva_id))
+
+    reserva = Reserva.query.get_or_404(reserva_id)
+    detalle_reservas = DetalleReserva.query.filter_by(reserva_id_reserva=reserva.id_reserva).all()
+    registro_juego = RegistroJuego.query.filter_by(reserva_id_reserva=reserva.id_reserva).first()
+    productos = Producto.query.filter_by(activo=True).all()
+    juegos = Juego.query.filter_by(activo=True).all()
+    return render_template('editar-reserva.html', reserva=reserva, productos=productos, juegos=juegos, detalle_reservas=detalle_reservas, registro_juego=registro_juego, timedelta=timedelta)
+
+
+@app.route('/actualizar_reserva', methods=['POST'])
+@login_required
+def actualizar_reserva():
+    reserva_id = request.form.get('id_reserva')
+    productos_seleccionados = request.form.get('productos').split(',')
+    juego_seleccionado = request.form.get('juego')
+
+    reserva = Reserva.query.get(reserva_id)
+
+    try:
+        # Actualizar detalles de la reserva
+        DetalleReserva.query.filter_by(reserva_id_reserva=reserva_id).delete()
+        RegistroJuego.query.filter_by(reserva_id_reserva=reserva_id).delete()
+
+        for producto in productos_seleccionados:
+            if producto:
+                producto_id, cantidad = map(int, producto.split(':'))
+                prod = Producto.query.get(producto_id)
+                detalle_reserva = DetalleReserva(
+                    cantidad=cantidad,
+                    precio=prod.precio,
+                    producto_id_producto=producto_id,
+                    reserva_id_reserva=reserva.id_reserva
+                )
+                db.session.add(detalle_reserva)
+
+        if juego_seleccionado:
+            juego_id, cantidad = map(int, juego_seleccionado.split(':'))
+            juego = Juego.query.get(juego_id)
+            registro_juego = RegistroJuego(
+                cantidad=cantidad,
+                precio=juego.precio_alquiler,
+                tipo=1,  # Asumir un tipo, ya que no está definido en el contexto
+                juego_id_juego=juego_id,
+                usuario_id_usuario=current_user.id_usuario,
+                reserva_id_reserva=reserva.id_reserva
+            )
+            db.session.add(registro_juego)
+
+        db.session.commit()
+        flash('Reserva actualizada con éxito.', 'success')
+        return redirect(url_for('user_reservations'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al actualizar la reserva: {str(e)}', 'danger')
+        return redirect(url_for('editar_reserva', reserva_id=reserva_id))
 
 
 
@@ -798,7 +1232,84 @@ def unarchive_game(juego_id):
 
 
 
+#----------------------vista admin
+def calcular_monto_total(reserva):
+    productos = DetalleReserva.query.filter_by(reserva_id_reserva=reserva.id_reserva).all()
+    juegos = RegistroJuego.query.filter_by(reserva_id_reserva=reserva.id_reserva).all()
+    monto_total = sum([p.precio * p.cantidad for p in productos]) + sum([j.precio * j.cantidad for j in juegos])
+    return monto_total
 
+@app.route('/reservas_panel', methods=['GET'])
+@login_required
+def reservas_panel():
+    group_by = request.args.get('group_by', 'todas')
+    search_query = request.args.get('search', '')
+    sort_by = request.args.get('sort_by', 'id_reserva')
+    sort_order = request.args.get('sort_order', 'asc')
+
+    reservas_query = Reserva.query.join(Usuario).filter(
+        Usuario.nombre.ilike(f'%{search_query}%')
+    )
+
+    if group_by == 'reservados':
+        reservas_query = reservas_query.filter(Reserva.estado == 'Reservado')
+    elif group_by == 'cancelado':
+        reservas_query = reservas_query.filter(Reserva.estado == 'Cancelado')
+
+    if sort_order == 'asc':
+        reservas_query = reservas_query.order_by(getattr(Reserva, sort_by).asc())
+    else:
+        reservas_query = reservas_query.order_by(getattr(Reserva, sort_by).desc())
+
+    reservas = reservas_query.all()
+
+    # Calcular monto total de cada reserva
+    for reserva in reservas:
+        reserva.monto_total = calcular_monto_total(reserva)
+
+    return render_template('reservas-panel.html', reservas=reservas, selected_group=group_by, search_query=search_query, sort_by=sort_by, sort_order=sort_order)
+
+@app.route('/cancel_reserva/<int:id_reserva>', methods=['POST'])
+@login_required
+def cancel_reserva(id_reserva):
+    reserva = Reserva.query.get_or_404(id_reserva)
+    reserva.estado = 'Cancelado'
+    db.session.commit()
+    flash('Reserva cancelada con éxito.', 'success')
+    return redirect(url_for('reservas_panel'))
+
+
+@app.route('/verDetalle-reserva/<int:id_reserva>', methods=['GET'])
+@login_required
+def ver_detalle_reserva(id_reserva):
+    reserva = Reserva.query.get_or_404(id_reserva)
+    cliente = reserva.usuario
+    mesa = reserva.mesa
+    detalle_reservas = DetalleReserva.query.filter_by(reserva_id_reserva=id_reserva).all()
+    registro_juego = RegistroJuego.query.filter_by(reserva_id_reserva=id_reserva).first()
+
+    productos = []
+    for detalle in detalle_reservas:
+        producto = {
+            'nombre': detalle.producto_rel.nombre,
+            'cantidad': detalle.cantidad,
+            'precio_unitario': detalle.precio,
+            'total': detalle.cantidad * detalle.precio
+        }
+        productos.append(producto)
+
+    total_reserva = sum([producto['total'] for producto in productos])
+    if registro_juego:
+        juego = {
+            'nombre': registro_juego.juego_rel.nombre,
+            'cantidad': registro_juego.cantidad,
+            'precio_unitario': registro_juego.precio,
+            'total': registro_juego.cantidad * registro_juego.precio
+        }
+        productos.append(juego)
+        total_reserva += juego['total']
+
+    return render_template('verDetalle-reserva.html', reserva=reserva, cliente=cliente, mesa=mesa, productos=productos, total_reserva=total_reserva)
 
 # proteger rutas - utilizado para proteger rutas que requieren login y autenticacion del usuario
 #decorador

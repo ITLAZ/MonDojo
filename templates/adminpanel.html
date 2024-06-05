@@ -11,15 +11,18 @@
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
+        <button class="menu-toggle" id="mobile-menu">
+            <span class="fas fa-bars"></span>
+        </button>        
         <ul class="nav-items">
             <li><a href="/adminpanel">Inicio</a></li>
             <li><a href="/userspanel">Usuarios</a></li>
-            <li><a href="/game_panel">Juegos</a></li>
-            <li><a href="/food_panel">Comida</a></li>
-            <li><a href="">Mesas</a></li>
-            <li><a href="">Reservas</a></li>
-            <li><a href="">Pedidos</a></li>
-            <li><a href="/logout">Cerrar Sesion</a></li>
+            <li><a href="/games-panel">Juegos</a></li>
+            <li><a href="/food-panel">Comida</a></li>
+            <li><a href="/registrar-mesas">Mesas</a></li>
+            <li><a href="/reservas-panel">Reservas</a></li>
+            <li><a href="/pedidos-panel">Pedidos</a></li>
+            <li><a href="/perfil_admin"><i class="fa-solid fa-user-gear"></i></a></li>
         </ul>
     </nav>
     <div class="container">
@@ -31,19 +34,19 @@
                 <span>Usuarios</span>
             </div>
             <div class="option">
-                <a href="/game_panel">
+                <a href="/games-panel">
                     <i class="fa-solid fa-dice"></i>
                 </a>
                 <span>Juegos</span>
             </div>
             <div class="option">
-                <a href="/food_panel">
+                <a href="/food-panel">
                     <i class="fa-solid fa-burger"></i>
                 </a>
                 <span>Comida</span>
             </div>
             <div class="option">
-                <a href="/adminpanel/orders">
+                <a href="/registrar-mesas">
                     <i class="fa-solid fa-utensils"></i>
                 </a>
                 <span>Mesas</span>
@@ -60,7 +63,6 @@
                 </a>
                 <span>Pedidos</span>
             </div>
-            
             <div class="option">
                 <a href="/perfil_admin">
                     <i class="fa-solid fa-user-gear"></i>
@@ -75,4 +77,11 @@
             </div>
         </div>
     </div>
+    
+    <script>
+    document.getElementById('mobile-menu').addEventListener('click', function () {
+        document.querySelector('.nav-items').classList.toggle('nav-items-active');
+    });
+</script>
 </body>
+</html>

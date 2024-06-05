@@ -66,6 +66,9 @@
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
+        <div class="nav-hamburger">
+            <i class="fa fa-bars"></i>
+        </div>
         <ul class="nav-items">
             <li><a href="adminpanel.html">Inicio</a></li>
             <li><a href="userspanel.html">Usuarios</a></li>
@@ -81,8 +84,8 @@
         <div class="title">Detalle de la reserva</div>
         <div class="header-container">
             <div>
-                <p><strong>Cliente:</strong> {{ cliente.nombre }}</p>
-                <p><strong>Mesa:</strong> {{ mesa.mesa }}</p>
+                <p><strong>Cliente:</strong> {{ reserva.usuario.nombre }}</p>
+                <p><strong>Mesa:</strong> {{ reserva.mesa.ubicacion }}</p>
             </div>
             <div>
                 <p><strong>Fecha y hora de la reserva:</strong> {{ reserva.fecha_hora }}</p>
@@ -96,22 +99,32 @@
                         <th>Producto</th>
                         <th>Cantidad</th>
                         <th>Precio unitario</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for reserva in reservas %}
+                    {% for detalle in reserva.detalles_reserva %}
                     <tr>
-                        <td>{{ reserva.producto }}</td>
-                        <td>{{ reserva.cantidad }}</td>
-                        <td>{{ reserva.precio_unitario }}</td>
+                        <td>{{ detalle.producto_rel.nombre }}</td>
+                        <td>{{ detalle.cantidad }}</td>
+                        <td>{{ detalle.precio }}</td>
+                        <td>{{ detalle.precio * detalle.cantidad }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         <div class="table-summary">
-            <p><strong>Total:</strong> {{ reserva.total }} Bs.</p>
+            <p><strong>Total:</strong> {{ total_reserva }} Bs.</p>
         </div>
     </div>
+     <!-- Script Responsive Navbar -->
+     <script>
+        document.querySelector('.nav-hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-items').classList.toggle('nav-items-active');
+        });
+    </script>
+    
+    
 </body>
 </html>

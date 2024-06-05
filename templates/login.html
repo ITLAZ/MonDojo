@@ -13,12 +13,15 @@
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
+        <div class="nav-hamburger">
+            <i class="fa fa-bars"></i>
+        </div>
         <ul class="nav-items">
-            <li><a href="">Inicio</a></li>
+            <li><a href="inicio.html">Inicio</a></li>
             <li><a href="">Juegos</a></li>
             <li><a href="">Comida</a></li>
             <li><a href="">Reservas</a></li>
-            <li><a href="">Registrarse</a></li>
+            <li><a href="register.html">Registrarse</a></li>
         </ul>
     </nav>
     <div class="container">
@@ -72,4 +75,10 @@
         background-color: #c23321;
     }
 </style>
+ <!-- Script Responsive Navbar -->
+ <script>
+    document.querySelector('.nav-hamburger').addEventListener('click', function() {
+        document.querySelector('.nav-items').classList.toggle('nav-items-active');
+    });
+</script>
 </html>

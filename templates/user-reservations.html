@@ -2,15 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Monster Dojo - Panel de Reservas Vista Admin</title>
-    <!-- Link css -->
+    <title>Mis Reservas</title>
     <link rel="stylesheet" href="../static/css/food-panel.css">
     <link rel="stylesheet" href="../static/css/popup_panel.css">
-    <!-- Link fonts -->
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Estilos para las alertas -->
     <style>
         .swal2-cancel {
             background-color: #192847 !important;
@@ -41,38 +38,6 @@
             pointer-events: none;
         }
 
-        .search-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 10px;
-            gap: 20px; 
-        }
-
-        .search-container button,
-        .add-buttons button {
-            margin-left: 10px;
-            margin-right: 10px;
-        }
-
-        .add-buttons {
-            display: flex;
-            gap: 20px; /* Espacio entre los botones de agregar producto y categoría */
-        }
-
-        .add-product button,
-        .add-category button {
-            width: auto;
-            background-color: var(--alt-primary-color);
-            color: var(--light-color);
-            font-size: 15px;
-            border: none;
-            padding: 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-left: 10px;
-            margin-right: 10px;
-        }
         .title {
             text-align: center;
             font-size: 24px;
@@ -104,52 +69,29 @@
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
-        <div class="nav-hamburger">
-            <i class="fa fa-bars"></i>
-        </div>
-        <ul class="nav-items">
-            <li><a href="adminpanel.html">Inicio</a></li>
-            <li><a href="userspanel.html">Usuarios</a></li>
-            <li><a href="games-panel.html">Juegos</a></li>
-            <li><a href="food-panel.html">Comida</a></li>
-            <li><a href="registrar-mesas.html">Mesas</a></li>
-            <li><a href="reservas-panel.html">Reservas</a></li>
-            <li><a href="pedidos-panel.html">Pedidos</a></li>
-            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li>
-        </ul>
     </nav>
     <div class="container">
-        <div class="title">Panel de Reservas</div>
+        <div class="title">Mis Reservas</div>
         <div class="group-by-container">
-            <form method="GET" action="/reservas_panel">
+            <form method="GET" action="/user_reservations">
                 <label for="group_by">Agrupar por:</label>
                 <select name="group_by" id="group_by" onchange="this.form.submit()">
                     <option value="todas" {% if selected_group == 'todas' %}selected{% endif %}>Todas</option>
                     <option value="reservados" {% if selected_group == 'reservados' %}selected{% endif %}>Reservados</option>
                     <option value="cancelado" {% if selected_group == 'cancelado' %}selected{% endif %}>Cancelado</option>
                 </select>
-                <input type="hidden" name="search" value="{{ search_query }}">
-                <input type="hidden" name="sort_by" id="sort_by" value="{{ sort_by }}">
-                <input type="hidden" name="sort_order" id="sort_order" value="{{ sort_order }}">
             </form>
-        </div>
-        <div class="actions-container">
-            <form method="GET" action="/reservas_panel">
-                <div class="search-container">
-                    <input type="text" name="search" placeholder="Buscar reserva" value="{{ search_query }}">
-                    <button type="submit">Buscar <i class="fa-solid fa-search"></i></button>
-                </div>
-            </form>
+            <button class="new-reserva-button" onclick="window.location.href='/form_reserva'">Crear Nueva Reserva</button>
+
         </div>
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
-                        <th>ID <button class="filter-btn" onclick="sortTable('id_reserva')"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Cliente <button class="filter-btn" onclick="sortTable('nombre')"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Fecha y Hora <button class="filter-btn" onclick="sortTable('fecha_hora')"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Estado Reserva <button class="filter-btn" onclick="sortTable('estado')"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Monto Total <button class="filter-btn" onclick="sortTable('monto_total')"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>ID</th>
+                        <th>Fecha y Hora</th>
+                        <th>Estado</th>
+                        <th>Monto Total</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -157,14 +99,13 @@
                     {% for reserva in reservas %}
                     <tr>
                         <td>{{ reserva.id_reserva }}</td>
-                        <td>{{ reserva.usuario.nombre }}</td>
                         <td>{{ reserva.fecha_hora }}</td>
                         <td>{{ reserva.estado }}</td>
                         <td>{{ reserva.monto_total }}</td>
                         <td>
                             <div class="action-buttons">
                                 {% if reserva.estado == 'Reservado' %}
-                                <button class="verDetallesBtn" data-id="{{ reserva.id_reserva }}"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                                <button class="editReservaBtn" data-id="{{ reserva.id_reserva }}"><i class="fa-solid fa-edit"></i></button>
                                 <button class="deleteReservaBtn" data-id="{{ reserva.id_reserva }}"><i class="fa-solid fa-trash"></i></button>
                                 {% endif %}
                             </div>
@@ -176,9 +117,15 @@
         </div>
     </div>
 
-    <!-- SCRIPT POP-UP -->
     <script>
-       document.querySelectorAll('.deleteReservaBtn').forEach(function(button) {
+        document.querySelectorAll('.editReservaBtn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const idReserva = this.getAttribute('data-id');
+                window.location.href = `/editar_reserva/${idReserva}`;
+            });
+        });
+
+        document.querySelectorAll('.deleteReservaBtn').forEach(function(button) {
             button.addEventListener('click', function() {
                 const idReserva = this.getAttribute('data-id');
                 Swal.fire({
@@ -194,7 +141,7 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`/cancel_reserva/${idReserva}`, {
+                        fetch(`/cancelar_reserva/${idReserva}`, {
                             method: 'POST'
                         }).then(response => {
                             if (response.ok) {
@@ -208,35 +155,6 @@
                     }
                 });
             });
-        });
-
-        document.querySelectorAll('.verDetallesBtn').forEach(function(button) {
-            button.addEventListener('click', function() {
-                const idReserva = this.getAttribute('data-id');
-                window.location.href = `/verDetalle-reserva/${idReserva}`;
-            });
-        });
-
-    
-
-        function sortTable(column) {
-            const sortByInput = document.getElementById('sort_by');
-            const sortOrderInput = document.getElementById('sort_order');
-
-            if (sortByInput.value === column) {
-                sortOrderInput.value = sortOrderInput.value === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortByInput.value = column;
-                sortOrderInput.value = 'asc';
-            }
-
-            document.querySelector('form').submit();
-        }
-    </script>
-    <!-- Script Responsive Navbar -->
-    <script>
-        document.querySelector('.nav-hamburger').addEventListener('click', function() {
-            document.querySelector('.nav-items').classList.toggle('nav-items-active');
         });
     </script>
 </body>

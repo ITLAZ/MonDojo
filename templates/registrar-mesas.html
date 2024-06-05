@@ -50,6 +50,7 @@
         }
 
         .search-container button,
+        .group-by-container button,
         .add-buttons button {
             margin-left: 10px;
             margin-right: 10px;
@@ -73,15 +74,23 @@
             margin-left: 10px;
             margin-right: 10px;
         }
-
-        #addProductBtn {
-            width: 250px; /* Hacer el botón más ancho */
+        
+        .group-by-container {
+            display: flex;
+            justify-content: flex-start;            
+            align-items: center;
+            margin-top: 10px;
+            gap: 5px; 
         }
-        .title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
+
+        .group-by-container label {
+            font-size: 14px;
+        }
+
+        .group-by-container select {
+            font-size: 14px;
+            padding: 5px;
+            width: 150px; /* Ajustar el tamaño del select */
         }
     </style>
 </head>
@@ -90,24 +99,34 @@
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
+        <div class="nav-hamburger">
+            <i class="fa fa-bars"></i>
+        </div>
         <ul class="nav-items">
-            <li><a href="adminpanel.html">Inicio</a></li>
-            <li><a href="userspanel.html">Usuarios</a></li>
-            <li><a href="games-panel.html">Juegos</a></li>
-            <li><a href="food-panel.html">Comida</a></li>
-            <li><a href="registrar-mesas.html">Mesas</a></li>
-            <li><a href="reservas-panel.html">Reservas</a></li>
-            <li><a href="pedidos-panel.html">Pedidos</a></li>
-            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li>
+            <li><a href="/adminpanel">Inicio</a></li>
+            <li><a href="/userspanel">Usuarios</a></li>
+            <li><a href="/juegos">Juegos</a></li>
+            <li><a href="/food_panel">Comida</a></li>
+            <li><a href="/registro_mesa">Mesas</a></li>
+            <li><a href="/reservas">Reservas</a></li>
+            <li><a href="/pedidos">Pedidos</a></li>
+            <li><a href="/perfil_admin"><i class="fa-solid fa-user-gear"></i></a></li>
         </ul>
     </nav>
     <div class="container">
         <div class="title">Registro de mesas</div>
         <div class="actions-container">
-            <form method="GET" action="/SearchUsuario">
+            <form method="GET" action="/registro_mesa">
                 <div class="search-container">
                     <input type="text" name="search" placeholder="Buscar mesa">
                     <button type="submit">Buscar <i class="fa-solid fa-search"></i></button>
+                </div>
+                <div class="group-by-container">
+                    <label for="group_by">Agrupar por:</label>
+                    <select name="group_by" id="group_by" onchange="this.form.submit()">
+                        <option value="">Todos</option>
+                        <option value="archivados" {% if selected_mesa == 'archivados' %}selected{% endif %}>Productos Archivados</option>
+                    </select>
                 </div>
             </form>
 
@@ -119,9 +138,9 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Capacidad <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
-                        <th>Ubicación <button class="filter-btn"><i class="fa-solid fa-sort"></i></button></th>
+                        <th>ID <a href="{{ url_for('registro_mesa', search=request.args.get('search', ''), sort_by='id_mesa', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'id_mesa') == 'id_mesa' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Capacidad <a href="{{ url_for('registro_mesa', search=request.args.get('search', ''), sort_by='capacidad', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'capacidad') == 'capacidad' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
+                        <th>Ubicación <a href="{{ url_for('registro_mesa', search=request.args.get('search', ''), sort_by='ubicacion', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'ubicacion') == 'ubicacion' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -134,7 +153,11 @@
                         <td>
                             <div class="action-buttons">
                                 <button class="editProductBtn" data-id="{{ mesa.id_mesa }}"><i class="fa-solid fa-edit"></i></button>
-                                <button class="deleteProductBtn" onclick="confirmDelete(event)"><i class="fa-solid fa-trash"></i></button>
+                                {% if mesa.activo %}
+                                <button class="deleteProductBtn" onclick="confirmDelete(event, '{{ mesa.id_mesa }}')"><i class="fa-solid fa-trash"></i></button>
+                                {% else %}
+                                <button class="unarchiveProductBtn" onclick="confirmUnarchive(event, '{{ mesa.id_mesa }}')"><i class="fa-solid fa-box-open"></i></button>
+                                {% endif %}
                             </div>
                         </td>                        
                     </tr>
@@ -150,7 +173,7 @@
             <span class="close-btn" onclick="closePopup()">&times;</span>
             <img src="../static/images/mesa.png" alt="Product Icon" class="product-icon">
             <h2>REGISTRO DE MESA</h2>
-            <form id="regForm" onsubmit="showSuccessMessage(event, 'contactPopup', 'regForm', 'Datos registrados con éxito')">
+            <form id="regForm" action="/add_mesa" method="POST" enctype="multipart/form-data" onsubmit="handleMesaSubmit(event)">
                 <div class="form-group">
                     <label for="capacidad">Capacidad</label>
                     <input type="number" id="capacidad" name="capacidad" required>
@@ -175,7 +198,7 @@
             <span class="close-btn" onclick="closeEditPopup()">&times;</span>
             <img src="../static/images/comedor.png" alt="Product Icon" class="product-icon">
             <h2>EDITAR MESA</h2>
-            <form id="editForm" onsubmit="showSuccessMessage(event, 'editPopup', 'editForm', 'Datos registrados con éxito')">
+            <form id="editForm" method="POST" onsubmit="handleEditMesaSubmit(event)">
                 <div class="form-group">
                     <label for="edit_capacidad">Capacidad</label>
                     <input type="number" id="edit_capacidad" name="capacidad" required>
@@ -200,11 +223,21 @@
             document.getElementById('contactPopup').style.display = 'block';
         });
 
-        document.querySelectorAll('.editProductBtn').forEach(function(button) {
-            button.addEventListener('click', function() {
-                document.getElementById('editPopup').style.display = 'block';
-            });
+        document.querySelectorAll('.editProductBtn').forEach(button => {
+        button.addEventListener('click', function() {
+            const mesaId = button.getAttribute('data-id');
+            fetch(`/get_mesa/${mesaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('edit_capacidad').value = data.capacidad;
+                    document.getElementById('edit_ubicacion').value = data.ubicacion;
+                    document.getElementById('editForm').action = `/update_mesa/${mesaId}`;
+                    document.getElementById('editPopup').style.display = 'block';
+                    showEditTab(0);
+                })
+                .catch(error => console.error('Error al cargar los datos del producto:', error));
         });
+    });
 
         function closePopup() {
             document.getElementById('contactPopup').style.display = 'none';
@@ -254,17 +287,76 @@
             }).then(() => {
                 document.getElementById(popupId).style.display = 'none';
                 document.getElementById(formId).reset();
+                window.location.href = "/registro_mesa";
             });
         }
 
-        function confirmDelete(event) {
+        function handleMesaSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            fetch(form.action, {
+                method: form.method,
+                body: new FormData(form)
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSuccessMessage(event, 'contactPopup', 'regForm', 'Producto registrado con éxito');
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                console.error('Error al registrar el producto:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Hubo un problema al registrar el producto.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'swal2-confirm'
+                    }
+                });
+            });
+        }
+
+        function handleEditMesaSubmit(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: form.method,
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                showSuccessMessage(event, 'editPopup', 'editForm', 'Producto actualizado con éxito');
+            } else {
+                return response.text().then(text => { throw new Error(text); });
+            }
+        })
+        .catch(error => {
+            console.error('Error al actualizar el producto:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al actualizar el producto.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            });
+        });
+    }
+
+    function confirmDelete(event, mesaId) {
             event.preventDefault(); // Prevenir la acción predeterminada del botón
             Swal.fire({
                 title: '¿Está seguro?',
-                text: '¿Está seguro de eliminar el registro?',
+                text: '¿Está seguro de archivar el producto?',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
+                confirmButtonText: 'Sí, archivar',
                 cancelButtonText: 'No, cancelar',
                 customClass: {
                     confirmButton: 'swal2-confirm',
@@ -272,11 +364,65 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Continuar con la acción de eliminar el registro
-                    Swal.fire('¡Eliminado!', 'El registro ha sido eliminado.', 'success');
+                    fetch(`/delete_mesa/${mesaId}`, {
+                        method: 'POST'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire('¡Archivado!', 'El producto ha sido archivado.', 'success').then(() => {
+                                window.location.href = "/registro_mesa";  // Redirigir al panel de productos/comida para ver los cambios
+                            });
+                        } else {
+                            return response.text().then(text => { throw new Error(text); });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al archivar el producto:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Hubo un problema al archivar el producto.',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                confirmButton: 'swal2-confirm'
+                            }
+                        });
+                    });
                 }
             });
         }
+        function confirmUnarchive(event, mesaId) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: '¿Está seguro de desarchivar la mesa?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, desarchivar',
+                cancelButtonText: 'No, cancelar',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/unarchive_mesa/${mesaId}`, {
+                        method: 'POST'
+                    }).then(() => {
+                        Swal.fire('¡Desarchivado!', 'El producto ha sido desarchivado.', 'success')
+                            .then(() => window.location.reload());
+                    }).catch(error => {
+                        Swal.fire('Error', 'No se pudo desarchivar el producto.', 'error');
+                    });
+                }
+            });
+        }
+    </script>
+    <!-- Script Responsive Navbar -->
+    <script>
+        document.querySelector('.nav-hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-items').classList.toggle('nav-items-active');
+        });
     </script>
 </body>
 </html>
