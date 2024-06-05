@@ -61,6 +61,7 @@ class Juego(db.Model):
     activo = db.Column(db.Boolean, default=True)
 
     categoria_juego_id_catJuego = db.Column(db.Integer, db.ForeignKey('categoria_juego.id_catJuego'), nullable=False)
+    registros_juego = db.relationship('RegistroJuego', back_populates='juego_rel')
 
 class Mesa(db.Model):
     __tablename__ = 'mesa'
@@ -68,6 +69,8 @@ class Mesa(db.Model):
     capacidad = db.Column(db.Integer, nullable=False)
     ubicacion = db.Column(db.String(200), nullable=False)
     activo = db.Column(db.Boolean, default=True)
+    reservas = db.relationship('Reserva', backref='mesa', lazy=True)
+
 
 
 class Pedido(db.Model):
@@ -90,6 +93,7 @@ class Producto(db.Model):
     activo = db.Column(db.Boolean, default=True)
 
     categoria_producto_id_catProducto = db.Column(db.Integer, db.ForeignKey('categoria_producto.id_catProducto'), nullable=False)
+    detalles_reserva = db.relationship('DetalleReserva', back_populates='producto_rel')
 
 
 class RegistroJuego(db.Model):
@@ -101,6 +105,8 @@ class RegistroJuego(db.Model):
     juego_id_juego = db.Column(db.Integer, db.ForeignKey('juego.id_juego'), nullable=False)
     usuario_id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'), nullable=False)
     reserva_id_reserva = db.Column(db.Integer, db.ForeignKey('reserva.id_reserva'), nullable=False)
+    reserva_rel = db.relationship('Reserva', back_populates='registro_juego')
+    juego_rel = db.relationship('Juego', back_populates='registros_juego')
 
 class Reserva(db.Model):
     __tablename__ = 'reserva'
@@ -109,6 +115,9 @@ class Reserva(db.Model):
     estado = db.Column(db.String(50), nullable=False)
     usuario_id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'), nullable=False)
     mesa_id_mesa = db.Column(db.Integer, db.ForeignKey('mesa.id_mesa'), nullable=False)
+    detalles_reserva = db.relationship('DetalleReserva', back_populates='reserva_rel')
+    registro_juego = db.relationship('RegistroJuego', back_populates='reserva_rel')
+
 
 class Pago(db.Model):
     __tablename__ = 'pago'
@@ -135,6 +144,9 @@ class DetalleReserva(db.Model):
     precio = db.Column(db.Float, nullable=False)
     producto_id_producto = db.Column(db.Integer, db.ForeignKey('producto.id_producto'), nullable=False)
     reserva_id_reserva = db.Column(db.Integer, db.ForeignKey('reserva.id_reserva'), nullable=False)
+    producto_rel = db.relationship('Producto', back_populates='detalles_reserva')
+    reserva_rel = db.relationship('Reserva', back_populates='detalles_reserva')
+
 
 class RegistroActividad(db.Model):
     __tablename__ = 'registro_actividad'
