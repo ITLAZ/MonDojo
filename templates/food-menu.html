@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <title>Menu de Comida</title>
-        <link rel="stylesheet" href="../static/css/food-menu.css">
-        <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
-    </head>
-    <body>
-        <div class="navbar">
-            <div class="nav-logo">
-                <img src="../static/images/logo.png" alt="Monster Dojo">
-            </div>
-            <button class="menu-toggle" id="mobile-menu">
-                <span class="fas fa-bars"></span>
-            </button>
-            <div class="navbar-right">
-                <a href="/">Home</a>
-                <a href="#about">Sobre nosotros</a>
-                <a href="#menu">Menú</a>
-                <a href="#order">Ubicación</a>
-                <a href="/login">Iniciar Sesión</a>
-            </div>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Menu de Comida</title>
+    <link rel="stylesheet" href="../static/css/food-menu.css">
+    <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="navbar">
+        <div class="nav-logo">
+            <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
-        <div class="container">
-            <div class="menu-section">
-                
-            
+        <button class="menu-toggle" id="mobile-menu">
+            <span class="fas fa-bars"></span>
+        </button>
+        <div class="navbar-right">
+            <a href="/">Home</a>
+            <a href="#about">Sobre nosotros</a>
+            <a href="#menu">Menú</a>
+            <a href="#order">Ubicación</a>
+            <a href="/perfil_user"><i class="fas fa-user"></i></a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="menu-section">
             {% for categoria in categorias %}
             {% if categoria.id_catProducto in productos_por_categoria %}
                 <div class="menu-section">
@@ -48,8 +48,16 @@
                     </div>
                 </div>
             {% endif %}
-        {% endfor %}
-            
+            {% endfor %}
         </div>
-    </body>
+    </div>
+
+    <script>
+        // Script para manejar el menú móvil
+        document.getElementById('mobile-menu').addEventListener('click', function () {
+            document.querySelector('.navbar-right').classList.toggle('active');
+        });
+    </script>
+</body>
+
 </html>

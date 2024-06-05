@@ -145,6 +145,9 @@
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
+        <div class="nav-hamburger">
+            <i class="fa fa-bars"></i>
+        </div>
         <ul class="nav-items">
             <li><a href="/adminpanel">Inicio</a></li>
             <li><a href="/userspanel">Usuarios</a></li>
@@ -680,6 +683,12 @@ function confirmUnarchive(event, gameId) {
     });
 }
 
+    </script>
+    <!-- Script Responsive Navbar -->
+    <script>
+        document.querySelector('.nav-hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-items').classList.toggle('nav-items-active');
+        });
     </script>
 </body>
 </html>

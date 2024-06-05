@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Reserva</title>
+    <title>Formulario de Reserva</title>
     <link rel="stylesheet" href="../static/css/form-reserva.css">
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
     <style>
@@ -57,7 +57,7 @@
             <a href="#about">Sobre nosotros</a>
             <a href="#menu">Menú</a>
             <a href="#order">Ubicación</a>
-            <a href="/login">Iniciar Sesión</a>
+            <a href="/perfil_user"><i class="fas fa-user"></i></a>
         </div>
     </div>
     <div class="container">
@@ -202,6 +202,7 @@
     </div>
 
     <script>
+<<<<<<< HEAD
         document.addEventListener('DOMContentLoaded', function() {
             const productosSeleccionadosList = document.querySelector('#productos-seleccionados-table tbody');
             const totalElement = document.getElementById('total');
@@ -333,6 +334,11 @@
                     }
                 });
             });
+=======
+        // Script para manejar el menú móvil
+        document.getElementById('mobile-menu').addEventListener('click', function () {
+            document.querySelector('.navbar-right').classList.toggle('active');
+>>>>>>> 6db916589063b7aa2bbc7748cac169b07980d2e0
         });
     </script>
 </body>
