@@ -4,21 +4,72 @@
     <meta charset="UTF-8">
     <title>Verificar Pregunta de Seguridad</title>
     <link rel="stylesheet" href="..\static\css\userforms.css">
+    <style>
+        .center-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5); /* Ajusta el fondo según tus necesidades */
+        }
+        .form-container.custom {
+            background-color: rgba(0, 0, 0, 0.8); /* Fondo semitransparente */
+            padding: 20px;
+            border-radius: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 70%; /* Ajuste de ancho */
+            max-width: 800px; /* Ajuste de ancho máximo */
+            color: #fff;
+        }
+        .form-container.custom h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--alt-primary-color); /* Color del texto del título */
+        }
+        .form-container.custom .input-container {
+            margin-bottom: 15px;
+        }
+        .form-container.custom .input-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--alt-primary-color); /* Color del texto de la etiqueta */
+        }
+        .form-container.custom .input-container input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-container.custom .input-container button {
+            width: 50%; /* Ancho reducido */
+            padding: 10px;
+            background-color: #192847;
+            color: #fff;
+            border: 3px solid #fff; /* Borde blanco grueso */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s; /* Transición suave */
+        }
+        .form-container.custom .input-container button:hover {
+            background-color: #d48600; /* Color amarillo al pasar el puntero */
+            color: #000; /* Cambiar color del texto al pasar el puntero */
+        }
+    </style>
 </head>
 <body>
     <div class="center-wrapper">
-            <div class="form-container">
-                 <form method="POST">
+        <div class="form-container custom">
+            <form method="POST">
                 <h3>Verificar Pregunta de Seguridad</h3>
                 <div class="input-container">
                     <label for="respuesta">{{ pregunta }}</label>
                     <input type="text" id="respuesta" name="respuesta" required>
-                 </div>
-                 <div class="input-container">
+                </div>
+                <div class="input-container">
                     <button type="submit">Verificar</button>
                 </div>
-                </form>
-            </div>
+            </form>
+        </div>
     </div>
 </body>
 </html>
