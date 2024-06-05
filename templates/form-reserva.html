@@ -1,49 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <title>Formulario de Reserva</title>
     <link rel="stylesheet" href="../static/css/form-reserva.css">
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
-    <style>
-        .hidden {
-            display: none;
-        }
-
-        .custom-checkbox {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background-color: #1c1c1c;
-            border: 2px solid #d48600;
-            border-radius: 5px;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .custom-checkbox input {
-            display: none;
-        }
-
-        .custom-checkbox input:checked + .checkmark::after {
-            content: '✔';
-            color: #d48600;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 16px;
-        }
-
-        .checkmark {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
 </head>
-
 <body>
     <div class="navbar">
         <div class="nav-logo">
@@ -53,11 +15,15 @@
             <span class="fas fa-bars"></span>
         </button>
         <div class="navbar-right">
-            <a href="/">Home</a>
-            <a href="#about">Sobre nosotros</a>
-            <a href="#menu">Menú</a>
+            <a href="/inicio_usuario">Home</a>
+            <a href="#about">Sobre Nosotros</a>
+            <a href="/food-menu">Menu</a>
             <a href="#order">Ubicación</a>
+            <a href="/game-menu">Productos</a>
+            <a href="/user_reservations">Reservas</a>
+            <a href="">Pedidos</a>
             <a href="/perfil_user"><i class="fas fa-user"></i></a>
+            <a href="#" id="helpBtn"><i class="fas fa-question-circle"></i></a>
         </div>
     </div>
     <div class="container">
@@ -72,7 +38,7 @@
                     <label for="end_time">Hora de Fin</label>
                     <input type="time" id="end_time" name="end_time" required value="{{ hora_fin }}">
                 </div>
-                <button type="submit" class="continuar-btn {% if mesas_disponibles %}hidden{% endif %}">Continuar</button>
+                <button type="button" class="btn" id="continuarBtn">Continuar</button>
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         <ul class="flashes">
@@ -83,9 +49,17 @@
                     {% endif %}
                 {% endwith %}
             </form>
+        </div>
+    </div>
+
+    <!-- Pop-up para confirmación -->
+    <div class="popup" id="confirmationPopup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup()">&times;</span>
+            <h2>Confirmar Reserva</h2>
 
             <!-- Mesas disponibles -->
-            <div class="mesas-section {% if not mesas_disponibles %}hidden{% endif %}">
+            <div class="mesas-section">
                 <h3>Mesas Disponibles</h3>
                 <ul>
                     {% for mesa_info in mesas_disponibles %}
@@ -101,7 +75,8 @@
                 <p id="mesa-error" style="color: red; display: none;">Selecciona una mesa</p>
             </div>
 
-            <div class="categoria-section {% if not mesas_disponibles %}hidden{% endif %}">
+            <!-- Categorías de productos y juegos -->
+            <div class="categoria-section">
                 <label for="categoria_productos">Categoría de Productos</label>
                 <select id="categoria_productos">
                     <option value="">Todas</option>
@@ -119,7 +94,7 @@
             </div>
 
             <!-- Productos disponibles -->
-            <div class="productos-section {% if not mesas_disponibles %}hidden{% endif %}">
+            <div class="productos-section">
                 <h3>Selecciona Productos</h3>
                 <table id="productos-table">
                     <thead>
@@ -134,7 +109,7 @@
                     <tbody>
                         {% for producto in productos %}
                         <tr data-categoria="{{ producto.categoria_producto_id_catProducto }}">
-                            <td><img src="{{ producto.imagen }}" alt="Imagen de {{ producto.nombre }}" width="50"></td>
+                            <td><img src="{{ producto.imagen }}" alt="Imagen de {{ producto.nombre }}"></td>
                             <td><input type="checkbox" class="producto-checkbox" data-id="{{ producto.id_producto }}" data-precio="{{ producto.precio }}"></td>
                             <td>{{ producto.nombre }}</td>
                             <td>{{ producto.precio }}</td>
@@ -146,7 +121,7 @@
             </div>
 
             <!-- Juegos disponibles -->
-            <div class="juegos-section {% if not mesas_disponibles %}hidden{% endif %}">
+            <div class="juegos-section">
                 <h3>Selecciona un Juego</h3>
                 <table id="juegos-table">
                     <thead>
@@ -160,7 +135,7 @@
                     <tbody>
                         {% for juego in juegos %}
                         <tr data-categoria="{{ juego.categoria_juego_id_catJuego }}">
-                            <td><img src="{{ juego.imagen }}" alt="Imagen de {{ juego.nombre }}" width="50"></td>
+                            <td><img src="{{ juego.imagen }}" alt="Imagen de {{ juego.nombre }}"></td>
                             <td><input type="radio" name="juego" class="juego-radio" data-id="{{ juego.id_juego }}" data-precio="{{ juego.precio_alquiler }}"></td>
                             <td>{{ juego.nombre }}</td>
                             <td>{{ juego.precio_alquiler }}</td>
@@ -171,7 +146,7 @@
             </div>
 
             <!-- Productos seleccionados -->
-            <div class="productos-seleccionados-section {% if not mesas_disponibles %}hidden{% endif %}">
+            <div class="productos-seleccionados-section">
                 <h3>Productos Seleccionados</h3>
                 <table id="productos-seleccionados-table">
                     <thead>
@@ -188,21 +163,59 @@
                 <div>Total: $<span id="total">0.00</span></div>
             </div>
 
-            <form id="confirmarReservaForm" method="POST" action="/confirmar_reserva" class="{% if not mesas_disponibles %}hidden{% endif %}">
+            <form id="confirmarReservaForm" method="POST" action="/confirmar_reserva">
                 <input type="hidden" name="date" value="{{ fecha }}">
                 <input type="hidden" name="start_time" value="{{ hora_inicio }}">
                 <input type="hidden" name="end_time" value="{{ hora_fin }}">
                 <input type="hidden" name="mesa" id="mesa-seleccionada">
                 <input type="hidden" name="productos">
                 <input type="hidden" name="juego">
-                <button type="submit" disabled>Confirmar Reserva</button>
-                <button type="button" onclick="window.location.href='/inicio_usuario'">Cancelar</button>
+                <button type="submit" class="confirm-btn">Confirmar Reserva</button>
+                <button type="button" class="btn" onclick="closePopup()">Cancelar</button>
             </form>
         </div>
     </div>
 
+    <!-- Pop-up para ayuda -->
+    <div class="help-popup" id="helpPopup">
+        <div class="help-popup-content">
+            <span class="close-btn" onclick="closeHelpPopup()">&times;</span>
+            <h2>Guía de Reserva 🗒️</h2>
+            <ol>
+                <li>Selecciona la fecha de tu reserva. 📆</li>
+                <li>Selecciona la hora de inicio y fin de tu reserva. 🕦</li>
+                <li>Haz clic en "Continuar". ➡️</li>
+                <li>Elige una mesa de las disponibles. 🪑</li>
+                <li>Selecciona los productos y juegos que deseas agregar a tu reserva. 🍕</li>
+                <li>Haz clic en "Confirmar Reserva" para completar el proceso. ✅</li>
+            </ol>
+            <h2>Cosas a tomar en cuenta 🗒️</h2>
+            <ol>
+            <li>Tomar en cuenta la hora de estadía en restaurante es de 2 horas y medía máximo. 🕦</li>
+            <li>Las reservas solo se pueden hacer una vez por fecha. 🗓️</li>
+            <li>Las reservas de juegos solo se puede pedir 1 por reserva. 🃏</li>
+            </ol>
+        </div>
+    </div>
+
     <script>
-<<<<<<< HEAD
+        document.getElementById('continuarBtn').addEventListener('click', function() {
+            document.getElementById('confirmationPopup').style.display = 'block';
+        });
+
+        function closePopup() {
+            document.getElementById('confirmationPopup').style.display = 'none';
+        }
+
+        document.getElementById('helpBtn').addEventListener('click', function() {
+            document.getElementById('helpPopup').style.display = 'block';
+        });
+
+        function closeHelpPopup() {
+            document.getElementById('helpPopup').style.display = 'none';
+        }
+
+        // Script para manejar la selección de productos y juegos, así como la confirmación de la reserva
         document.addEventListener('DOMContentLoaded', function() {
             const productosSeleccionadosList = document.querySelector('#productos-seleccionados-table tbody');
             const totalElement = document.getElementById('total');
@@ -297,7 +310,7 @@
                     document.getElementById('mesa-error').style.display = 'block';
                     return;
                 }
-                
+
                 const productos = [];
                 let juego = '';
                 productosSeleccionadosList.querySelectorAll('tr').forEach(tr => {
@@ -334,13 +347,12 @@
                     }
                 });
             });
-=======
-        // Script para manejar el menú móvil
-        document.getElementById('mobile-menu').addEventListener('click', function () {
-            document.querySelector('.navbar-right').classList.toggle('active');
->>>>>>> 6db916589063b7aa2bbc7748cac169b07980d2e0
+
+            // Script para manejar el menú móvil
+            document.getElementById('mobile-menu').addEventListener('click', function() {
+                document.querySelector('.navbar-right').classList.toggle('active');
+            });
         });
     </script>
 </body>
-
 </html>
