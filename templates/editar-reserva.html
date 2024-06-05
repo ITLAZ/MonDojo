@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <title>Editar Reserva</title>
@@ -41,9 +40,75 @@
             width: 100%;
             height: 100%;
         }
+
+        /* Estilos para el botón de eliminar */
+        .eliminar-btn {
+            background-color: #192847;
+            color: #FAF7E6;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .eliminar-btn:hover {
+            background-color: #FAF7E6;
+            color: #192847;
+            border: 1px solid #192847;
+        }
+
+        /* Estilos para el Pop-up de ayuda */
+        .help-popup {
+            display: none; /* Ocultar el pop-up inicialmente */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .help-popup-content {
+            position: relative;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            background-color: #FAF7E6;
+            border-radius: 10px;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .help-popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #192847;
+        }
+
+        .help-popup h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #d48600;
+            text-align: center;
+        }
+
+        .help-popup ol {
+            padding-left: 20px;
+            color: #192847;
+        }
+
+        .help-popup ol li {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
-
 <body>
     <div class="navbar">
         <div class="nav-logo">
@@ -53,11 +118,15 @@
             <span class="fas fa-bars"></span>
         </button>
         <div class="navbar-right">
-            <a href="/">Home</a>
-            <a href="#about">Sobre nosotros</a>
-            <a href="#menu">Menú</a>
+            <a href="/inicio_usuario">Home</a>
+            <a href="#about">Sobre Nosotros</a>
+            <a href="/food-menu">Menu</a>
             <a href="#order">Ubicación</a>
-            <a href="/login">Iniciar Sesión</a>
+            <a href="/game-menu">Productos</a>
+            <a href="/user_reservations">Reservas</a>
+            <a href="">Pedidos</a>
+            <a href="/perfil_user"><i class="fas fa-user"></i></a>
+            <a href="#" id="helpBtn"><i class="fas fa-question-circle"></i></a>
         </div>
     </div>
     <div class="container">
@@ -65,10 +134,12 @@
             <h2>Editar Reserva</h2>
             <form id="editarReservaForm" method="POST" action="/actualizar_reserva">
                 <input type="hidden" name="id_reserva" value="{{ reserva.id_reserva }}">
+                
                 <div class="mesas-section">
                     <h3>Mesa Seleccionada</h3>
                     <p>Mesa {{ reserva.mesa.id_mesa }} - Capacidad: {{ reserva.mesa.capacidad }} - Ubicación: {{ reserva.mesa.ubicacion }}</p>
                 </div>
+
                 <div class="productos-section">
                     <h3>Selecciona Productos</h3>
                     <table id="productos-table">
@@ -157,13 +228,44 @@
 
                 <input type="hidden" name="productos">
                 <input type="hidden" name="juego">
-                <button type="submit">Guardar Cambios</button>
-                <button type="button" onclick="window.location.href='/user_reservations'">Cancelar</button>
+                <button type="submit" class="confirm-btn">Guardar Cambios</button>
+                <button type="button" class="btn" onclick="window.location.href='/user_reservations'">Cancelar</button>
             </form>
+        </div>
+    </div>
+    
+    <!-- Pop-up para ayuda -->
+    <div class="help-popup" id="helpPopup">
+        <div class="help-popup-content">
+            <span class="close-btn" onclick="closeHelpPopup()">&times;</span>
+            <h2>Guía de Reserva 🗒️</h2>
+            <ol>
+                <li>Selecciona la fecha de tu reserva. 📆</li>
+                <li>Selecciona la hora de inicio y fin de tu reserva. 🕦</li>
+                <li>Haz clic en "Continuar". ➡️</li>
+                <li>Elige una mesa de las disponibles. 🪑</li>
+                <li>Selecciona los productos y juegos que deseas agregar a tu reserva. 🍕</li>
+                <li>Haz clic en "Confirmar Reserva" para completar el proceso. ✅</li>
+            </ol>
+            <h2>Cosas a tomar en cuenta 🗒️</h2>
+            <ol>
+                <li>Tomar en cuenta la hora de estadía en restaurante es de 2 horas y medía máximo. 🕦</li>
+                <li>Las reservas solo se pueden hacer una vez por fecha. 🗓️</li>
+                <li>Las reservas de juegos solo se puede pedir 1 por reserva. 🃏</li>
+            </ol>
         </div>
     </div>
 
     <script>
+        document.getElementById('helpBtn').addEventListener('click', function() {
+            document.getElementById('helpPopup').style.display = 'block';
+        });
+
+        function closeHelpPopup() {
+            document.getElementById('helpPopup').style.display = 'none';
+        }
+
+        // Script para manejar la selección de productos y juegos, así como la confirmación de la reserva
         document.addEventListener('DOMContentLoaded', function() {
             const productosSeleccionadosList = document.querySelector('#productos-seleccionados-table tbody');
             const totalElement = document.getElementById('total');
@@ -258,7 +360,12 @@
 
             updateTotal();
         });
-    </script>
-</body>
 
+        // Script para manejar el menú móvil
+        document.getElementById('mobile-menu').addEventListener('click', function() {
+                document.querySelector('.navbar-right').classList.toggle('active');
+            });
+    </script>
+
+</body>
 </html>

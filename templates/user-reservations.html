@@ -47,10 +47,16 @@
 
         .group-by-container {
             display: flex;
-            justify-content: flex-start;            
+            justify-content: space-between;
             align-items: center;
             margin-top: 10px;
             gap: 5px; 
+        }
+
+        .group-by-container form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .group-by-container label {
@@ -62,6 +68,22 @@
             padding: 5px;
             width: 150px; /* Ajustar el tamaño del select */
         }
+
+        .new-reserva-button {
+            background-color: #192847;
+            color: #FAF7E6;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            width: auto;
+        }
+
+        .new-reserva-button:hover {
+            background-color: #d48600;
+            color: #192847;
+        }
     </style>
 </head>
 <body>
@@ -69,6 +91,18 @@
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
+        <div class="nav-hamburger">
+            <i class="fa fa-bars"></i>
+        </div>
+        <ul class="nav-items">
+            <li><a href="/inicio_usuario">Home</a></li>
+            <li><a href="#about">Sobre Nosotros</a></li>
+            <li><a href="/food-menu">Menu</a></li>
+            <li> <a href="/game-menu">Productos</a></li>
+            <li><a href="/user_reservations">Reservas</a></li>
+            <li><a href="/pedidos">Pedidos</a></li>
+            <li><a href="/perfil_user"><i class="fas fa-user"></a></i>
+        </ul>
     </nav>
     <div class="container">
         <div class="title">Mis Reservas</div>
@@ -82,7 +116,6 @@
                 </select>
             </form>
             <button class="new-reserva-button" onclick="window.location.href='/form_reserva'">Crear Nueva Reserva</button>
-
         </div>
         <div class="table-responsive">
             <table>
@@ -155,6 +188,12 @@
                     }
                 });
             });
+        });
+    </script>
+    <!-- Script Responsive Navbar -->
+    <script>
+        document.querySelector('.nav-hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-items').classList.toggle('nav-items-active');
         });
     </script>
 </body>
