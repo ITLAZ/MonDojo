@@ -7,7 +7,7 @@ from .models import Usuario, RegistroActividad
 from sqlalchemy.exc import SQLAlchemyError
 from flask import redirect, url_for, flash
 from flask_dance.contrib.google import google
-from .models import Usuario, CategoriaProducto, Producto, CategoriaJuego, Juego, Mesa, Reserva, DetalleReserva, RegistroJuego
+from .models import Usuario, CategoriaProducto, Producto, CategoriaJuego, Juego, Mesa, Reserva, DetalleReserva, RegistroJuego, Pedido, DetallePedido
 import datetime
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_login import login_required as flask_login_required
@@ -1066,7 +1066,7 @@ def confirmar_reserva():
 
         db.session.commit()
         flash('Reserva confirmada con éxito.', 'success')
-        return redirect(url_for('inicio_usuario'))
+        return redirect(url_for('user_reservations'))
 
     except Exception as e:
         db.session.rollback()
@@ -1298,18 +1298,238 @@ def ver_detalle_reserva(id_reserva):
         }
         productos.append(producto)
 
+    print("Productos:", productos)
+
     total_reserva = sum([producto['total'] for producto in productos])
+
     if registro_juego:
         juego = {
             'nombre': registro_juego.juego_rel.nombre,
-            'cantidad': registro_juego.cantidad,
+            'cantidad': 1,  # Supongo que la cantidad de juegos es siempre 1 por reserva
             'precio_unitario': registro_juego.precio,
-            'total': registro_juego.cantidad * registro_juego.precio
+            'total': registro_juego.precio
         }
         productos.append(juego)
         total_reserva += juego['total']
+        print("Juego agregado:", juego)
+    else:
+        print("No se encontró juego para esta reserva.")
+
+    print("Productos finales:", productos)
+    print("Total reserva:", total_reserva)
 
     return render_template('verDetalle-reserva.html', reserva=reserva, cliente=cliente, mesa=mesa, productos=productos, total_reserva=total_reserva)
+
+
+
+@app.route('/agregar_pedido', methods=['GET', 'POST'])
+@login_required
+def agregar_pedido():
+    # Verificar si el usuario tiene una reserva activa en la fecha y hora actual
+    now = datetime.now()
+    reserva_activa = Reserva.query.filter(
+        Reserva.usuario_id_usuario == current_user.id_usuario,
+        Reserva.fecha_hora <= now,
+        Reserva.fecha_hora + timedelta(hours=2, minutes=30) >= now,
+        Reserva.estado == 'Reservado'
+    ).first()
+
+    if not reserva_activa:
+        flash('No tienes una reserva activa en este momento. No puedes realizar pedidos.', 'danger')
+        return render_template('sin_reserva.html')
+
+    if request.method == 'POST':
+        # Lógica para agregar un pedido
+        productos_seleccionados = request.form.get('productos').split(',')
+        pedido = Pedido(
+            tipo='Mesa',
+            estado='Pendiente',
+            fecha_hora=datetime.now(),
+            usuario_id_usuario=current_user.id_usuario,
+            mesa_id_mesa=reserva_activa.mesa_id_mesa
+        )
+        db.session.add(pedido)
+        db.session.commit()
+
+        for producto in productos_seleccionados:
+            if producto:
+                producto_id, cantidad = map(int, producto.split(':'))
+                prod = Producto.query.get(producto_id)
+                detalle_pedido = DetallePedido(
+                    cantidad=cantidad,
+                    precio=prod.precio,
+                    producto_id_producto=producto_id,
+                    pedido_id_pedido=pedido.id_pedido
+                )
+                db.session.add(detalle_pedido)
+        db.session.commit()
+
+        flash('Pedido realizado con éxito.', 'success')
+        return redirect(url_for('inicio_usuario'))
+
+    productos = Producto.query.filter_by(activo=True).all()
+    return render_template('agregar-pedido.html', productos=productos, reserva_activa=reserva_activa)
+
+
+
+
+
+
+
+
+
+#ver pedidos - usuario
+@app.route('/ver_pedidos', methods=['GET'])
+@login_required
+def ver_pedidos():
+    group_by = request.args.get('group_by', 'Pendiente')
+    pedidos = Pedido.query.filter_by(usuario_id_usuario=current_user.id_usuario, estado=group_by).all()
+
+    pedidos_con_totales = []
+    for pedido in pedidos:
+        total_pedido = sum(detalle.cantidad * detalle.precio for detalle in pedido.detalles_pedido)
+        pedido_info = {
+            'id_pedido': pedido.id_pedido,
+            'fecha_hora': pedido.fecha_hora,
+            'estado': pedido.estado,
+            'monto_total': total_pedido
+        }
+        pedidos_con_totales.append(pedido_info)
+
+    return render_template('ver-pedidos.html', pedidos=pedidos_con_totales, selected_group=group_by)
+
+
+#cancelar un pedido - usuario
+@app.route('/cancelar_pedido/<int:id_pedido>', methods=['POST'])
+@login_required
+def cancelar_pedido(id_pedido):
+    pedido = Pedido.query.get_or_404(id_pedido)
+    if pedido.estado == 'Pendiente':
+        pedido.estado = 'Cancelado'
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    return jsonify({'status': 'error'}), 400
+
+
+
+@app.route('/userpedidos/<int:pedido_id>', methods=['GET'])
+@login_required
+def userspedidos(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    detalles_pedido = DetallePedido.query.filter_by(pedido_id_pedido=pedido_id).all()
+
+    productos = []
+    for detalle in detalles_pedido:
+        producto = {
+            'nombre': detalle.producto_rel.nombre,
+            'cantidad': detalle.cantidad,
+            'precio_unitario': detalle.precio,
+            'total': detalle.cantidad * detalle.precio
+        }
+        productos.append(producto)
+
+    total_pedido = sum([producto['total'] for producto in productos])
+
+    mesa = Mesa.query.get_or_404(pedido.mesa_id_mesa)
+
+    return render_template('userpedidos.html', pedido=pedido, productos=productos, total_pedido=total_pedido, mesa=mesa)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from sqlalchemy import asc, desc, or_
+
+@app.route('/pedidos_panel', methods=['GET'])
+@login_required
+def pedidos_panel():
+    group_by = request.args.get('group_by', 'todos')
+    search_query = request.args.get('search', '')
+    sort_by = request.args.get('sort_by', 'fecha_hora')
+    sort_order = request.args.get('sort_order', 'asc')
+
+    pedidos_query = Pedido.query.join(Usuario)
+
+    if group_by != 'todos':
+        pedidos_query = pedidos_query.filter(Pedido.estado.ilike(group_by))
+
+    if search_query:
+        search = f"%{search_query}%"
+        pedidos_query = pedidos_query.filter(
+            or_(
+                Usuario.nombre.ilike(search),
+                Pedido.estado.ilike(search)
+            )
+        )
+
+    if sort_order == 'asc':
+        pedidos_query = pedidos_query.order_by(asc(getattr(Pedido, sort_by)))
+    else:
+        pedidos_query = pedidos_query.order_by(desc(getattr(Pedido, sort_by)))
+
+    pedidos = pedidos_query.all()
+
+    pedidos_con_totales = []
+    for pedido in pedidos:
+        total_pedido = sum([detalle.precio * detalle.cantidad for detalle in pedido.detalles_pedido])
+        pedidos_con_totales.append({'pedido': pedido, 'total': total_pedido})
+
+    return render_template('pedidos-panel.html', pedidos=pedidos_con_totales, selected_group=group_by, search_query=search_query, sort_by=sort_by, sort_order=sort_order)
+
+@app.route('/cambiar_estado_pedido/<int:pedido_id>/<string:nuevo_estado>', methods=['POST'])
+@login_required
+def cambiar_estado_pedido(pedido_id, nuevo_estado):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    pedido.estado = nuevo_estado
+    db.session.commit()
+    return redirect(url_for('pedidos_panel'))
+
+
+@app.route('/cancel_pedido/<int:id_pedido>', methods=['POST'])
+@login_required
+def cancel_pedido(id_pedido):
+    pedido = Pedido.query.get_or_404(id_pedido)
+    if pedido.estado == 'Pendiente':
+        pedido.estado = 'Cancelado'
+        db.session.commit()
+        return jsonify({'message': 'Pedido cancelado con éxito.'}), 200
+    return jsonify({'message': 'No se puede cancelar el pedido.'}), 400
+
+@app.route('/verDetalle-pedido/<int:pedido_id>', methods=['GET'])
+@login_required
+def ver_detalle_pedido(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    detalles_pedido = DetallePedido.query.filter_by(pedido_id_pedido=pedido_id).all()
+
+    productos = []
+    for detalle in detalles_pedido:
+        producto = {
+            'nombre': detalle.producto_rel.nombre,
+            'cantidad': detalle.cantidad,
+            'precio_unitario': detalle.precio,
+            'total': detalle.cantidad * detalle.precio
+        }
+        productos.append(producto)
+
+    total_pedido = sum([producto['total'] for producto in productos])
+
+    return render_template('verDetalle-pedido.html', pedido=pedido, productos=productos, total_pedido=total_pedido)
+
+
+
 
 # proteger rutas - utilizado para proteger rutas que requieren login y autenticacion del usuario
 #decorador

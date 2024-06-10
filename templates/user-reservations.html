@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Mis Reservas</title>
+     <!-- Link icons -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+     <!-- Link fonts -->
+     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+     <!-- Link css -->
+     <link rel="stylesheet" href="/static/css/inicio.css">
+     <link rel="stylesheet" href="/static/css/navbar.css">
     <link rel="stylesheet" href="../static/css/food-panel.css">
     <link rel="stylesheet" href="../static/css/popup_panel.css">
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
@@ -47,10 +55,16 @@
 
         .group-by-container {
             display: flex;
-            justify-content: flex-start;            
+            justify-content: space-between;
             align-items: center;
             margin-top: 10px;
             gap: 5px; 
+        }
+
+        .group-by-container form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .group-by-container label {
@@ -62,14 +76,41 @@
             padding: 5px;
             width: 150px; /* Ajustar el tamaño del select */
         }
+
+        .new-reserva-button {
+            background-color: #192847;
+            color: #FAF7E6;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            width: auto;
+        }
+
+        .new-reserva-button:hover {
+            background-color: #d48600;
+            color: #192847;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar">
+    <div class="navbar">
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
-    </nav>
+        <button class="menu-toggle" id="mobile-menu">
+            <span class="fas fa-bars"></span>
+        </button>
+        <div class="navbar-right">
+            <a href="/inicio_usuario">Home</a>
+            <a href="/food-menu">Menu</a>
+            <a href="/game-menu">Productos</a>
+            <a href="/user_reservations">Reservas</a>
+            <a href="/ver_pedidos">Pedidos</a>
+            <a href="/perfil_user"><i class="fas fa-user"></i></a>
+        </div>
+    </div>
     <div class="container">
         <div class="title">Mis Reservas</div>
         <div class="group-by-container">

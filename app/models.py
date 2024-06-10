@@ -19,6 +19,7 @@ class Usuario(db.Model,UserMixin):
     registros_juego = db.relationship('RegistroJuego', backref='usuario', lazy=True)
     reservas = db.relationship('Reserva', backref='usuario', lazy=True)
     actividades = db.relationship('RegistroActividad', backref='usuario', lazy=True)
+    pedidos = db.relationship('Pedido', back_populates='usuario_rel')
 
     def __repr__(self):
         return '<Usuario {}>'.format(self.nombre)
@@ -70,6 +71,7 @@ class Mesa(db.Model):
     ubicacion = db.Column(db.String(200), nullable=False)
     activo = db.Column(db.Boolean, default=True)
     reservas = db.relationship('Reserva', backref='mesa', lazy=True)
+    pedidos = db.relationship('Pedido', back_populates='mesa_rel')
 
 
 
@@ -81,6 +83,10 @@ class Pedido(db.Model):
     fecha_hora = db.Column(db.DateTime, nullable=False)
     usuario_id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'), nullable=False)
     mesa_id_mesa = db.Column(db.Integer, db.ForeignKey('mesa.id_mesa'), nullable=False)
+    detalles_pedido = db.relationship('DetallePedido', back_populates='pedido_rel')
+    usuario_rel = db.relationship('Usuario', back_populates='pedidos')
+    mesa_rel = db.relationship('Mesa', back_populates='pedidos')
+
 
 class Producto(db.Model):
     __tablename__ = 'producto'
@@ -94,7 +100,7 @@ class Producto(db.Model):
 
     categoria_producto_id_catProducto = db.Column(db.Integer, db.ForeignKey('categoria_producto.id_catProducto'), nullable=False)
     detalles_reserva = db.relationship('DetalleReserva', back_populates='producto_rel')
-
+    detalles_pedido = db.relationship('DetallePedido', back_populates='producto_rel')
 
 class RegistroJuego(db.Model):
     __tablename__ = 'registro_juego'
@@ -136,6 +142,8 @@ class DetallePedido(db.Model):
     precio = db.Column(db.Float, nullable=False)
     producto_id_producto = db.Column(db.Integer, db.ForeignKey('producto.id_producto'), nullable=False)
     pedido_id_pedido = db.Column(db.Integer, db.ForeignKey('pedido.id_pedido'), nullable=False)
+    producto_rel = db.relationship('Producto', back_populates='detalles_pedido')
+    pedido_rel = db.relationship('Pedido', back_populates='detalles_pedido')
 
 class DetalleReserva(db.Model):
     __tablename__ = 'detalle_reserva'

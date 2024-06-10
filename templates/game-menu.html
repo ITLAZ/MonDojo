@@ -4,13 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Menu de Juegos</title>
+     <!-- Link icons -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+     <!-- Link fonts -->
+     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+     <!-- Link css -->
+     <link rel="stylesheet" href="/static/css/inicio.css">
+     <link rel="stylesheet" href="/static/css/navbar.css">
     <link rel="stylesheet" href="../static/css/game-menu.css">
     <link rel="stylesheet" href="../static/css/popup_carrito.css">
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <div class="navbar">
+     <!-- NAVBAR -->
+     <div class="navbar">
         <div class="nav-logo">
             <img src="../static/images/logo.png" alt="Monster Dojo">
         </div>
@@ -18,12 +27,12 @@
             <span class="fas fa-bars"></span>
         </button>
         <div class="navbar-right">
-            <a href="/">Home</a>
-            <a href="#about">Sobre nosotros</a>
-            <a href="#menu">Menú</a>
-            <a href="#order">Ubicación</a>
+            <a href="/inicio_usuario">Home</a>
+            <a href="/food-menu">Menu</a>
+            <a href="/game-menu">Productos</a>
+            <a href="/user_reservations">Reservas</a>
+            <a href="/ver_pedidos">Pedidos</a>
             <a href="/perfil_user"><i class="fas fa-user"></i></a>
-            <a href="#" id="cart-icon"><i class="fas fa-shopping-cart"></i></a> <!-- Ícono del carrito de compras -->
         </div>
     </div>
     <div class="container">
@@ -57,13 +66,12 @@
                                 <span>{{ juego.categoria_juego.nombre }}</span>
                             </li>
                         </ul>
-                        <a href="#">Solicitar</a>
                     </div>
                 </div>
             {% endfor %}
         </div>
     </div>
-    <!-- Pop-up del carrito de compras -->
+    <!-- Pop-up del carrito de compras
     <div class="popup" id="shoppingCartPopup">
         <div class="popup-content">
             <span class="close-btn" onclick="closePopup()">&times;</span>
@@ -140,7 +148,7 @@
                 <button class="checkout-btn">Pedir</button>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <script>
         document.getElementById('cart-icon').addEventListener('click', function(event) {

@@ -6,6 +6,7 @@
     <title>Editar Reserva</title>
     <link rel="stylesheet" href="../static/css/form-reserva.css">
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .hidden {
             display: none;
@@ -40,6 +41,74 @@
             display: block;
             width: 100%;
             height: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #d48600;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #1c1c1c;
+            color: #d48600;
+        }
+
+        td img {
+            width: 50px;
+            height: auto;
+        }
+
+        select, input[type="number"], input[type="date"], input[type="time"] {
+            padding: 10px;
+            border: 1px solid #d48600;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #f0f0f0;
+        }
+
+        .eliminar-btn {
+            background: none;
+            border: none;
+            color: #d48600;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .eliminar-btn i {
+            font-size: 18px;
+        }
+
+        .continuar-btn {
+            background-color: #1c1c1c;
+            color: #d48600;
+            border: 1px solid #d48600;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .continuar-btn:hover {
+            background-color: #d48600;
+            color: #1c1c1c;
+        }
+        
+        .swal2-cancel {
+            background-color: #192847 !important;
+            color: #fff !important;
+        }
+
+        .swal2-confirm {
+            background-color: #d48600 !important;
+            color: #fff !important;
+            width: 120px !important;
         }
     </style>
 </head>
@@ -138,7 +207,7 @@
                                 <td>{{ detalle.precio }}</td>
                                 <td>{{ detalle.cantidad }}</td>
                                 <td>{{ detalle.precio * detalle.cantidad }}</td>
-                                <td><button type="button" class="eliminar-btn">Eliminar</button></td>
+                                <td><button type="button" class="eliminar-btn"><i class="fas fa-trash-alt"></i></button></td>
                             </tr>
                             {% endfor %}
                             {% if registro_juego %}
@@ -147,7 +216,7 @@
                                 <td>{{ registro_juego.precio }}</td>
                                 <td>{{ registro_juego.cantidad }}</td>
                                 <td>{{ registro_juego.precio * registro_juego.cantidad }}</td>
-                                <td><button type="button" class="eliminar-btn">Eliminar</button></td>
+                                <td><button type="button" class="eliminar-btn"><i class="fas fa-trash-alt"></i></button></td>
                             </tr>
                             {% endif %}
                         </tbody>
@@ -157,13 +226,49 @@
 
                 <input type="hidden" name="productos">
                 <input type="hidden" name="juego">
-                <button type="submit">Guardar Cambios</button>
-                <button type="button" onclick="window.location.href='/user_reservations'">Cancelar</button>
+                <button type="submit" id="guardarCambiosBtn">Guardar Cambios</button>
+                <button type="button" id="cancelarEdicionBtn">Cancelar</button>
             </form>
         </div>
     </div>
 
     <script>
+        function confirmCancel() {
+            let confirmMessage = '¿Está seguro de cancelar? Se perderán los datos.';
+
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: confirmMessage,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No, mantener',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/user_reservations';
+                }
+            });
+        }
+
+        function showSuccessMessage(event, formId, message) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¡Éxito!',
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            }).then(() => {
+                document.getElementById(formId).submit();
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const productosSeleccionadosList = document.querySelector('#productos-seleccionados-table tbody');
             const totalElement = document.getElementById('total');
@@ -189,7 +294,7 @@
                     <td>${precio.toFixed(2)}</td>
                     <td>${cantidad}</td>
                     <td>${(precio * cantidad).toFixed(2)}</td>
-                    <td><button type="button" class="eliminar-btn">Eliminar</button></td>
+                    <td><button type="button" class="eliminar-btn"><i class="fas fa-trash-alt"></i></button></td>
                 `;
                 productosSeleccionadosList.appendChild(tr);
                 updateTotal();
@@ -236,13 +341,13 @@
             });
 
             productosSeleccionadosList.addEventListener('click', function(e) {
-                if (e.target.classList.contains('eliminar-btn')) {
+                if (e.target.classList.contains('eliminar-btn') || e.target.closest('.eliminar-btn')) {
                     e.target.closest('tr').remove();
                     updateTotal();
                 }
             });
 
-            document.querySelector('#editarReservaForm').addEventListener('submit', function() {
+            document.querySelector('#editarReservaForm').addEventListener('submit', function(e) {
                 const productos = [];
                 let juego = '';
                 productosSeleccionadosList.querySelectorAll('tr').forEach(tr => {
@@ -254,7 +359,11 @@
                 });
                 this.querySelector('input[name="productos"]').value = productos.join(',');
                 this.querySelector('input[name="juego"]').value = juego;
+
+                showSuccessMessage(e, 'editarReservaForm', 'Cambios guardados exitosamente.');
             });
+
+            document.getElementById('cancelarEdicionBtn').addEventListener('click', confirmCancel);
 
             updateTotal();
         });

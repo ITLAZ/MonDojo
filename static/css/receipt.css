@@ -1,4 +1,3 @@
-food-menu.css
 * {
     margin: 0;
     padding: 0;
@@ -6,10 +5,10 @@ food-menu.css
 }
 
 body {
-    height: 100%;
-    width: 100%;
     font-family: 'Poppins', sans-serif;
-    background-color: #B7D8E6;
+    background-image: url('../images/background.jpg');
+    background-size: cover;
+    color: #192847;
 }
 
 .navbar {
@@ -79,87 +78,58 @@ body {
 
 .container {
     width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     padding: 30px;
-    margin-top: 60px;
+    margin-top: 70px;
 }
 
-.menu-section {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    width: 100%;
-}
-
-.menu-category {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.receipt-section{
     background-color: #FAF7E6;
-    border-radius: 25px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    margin: 10px;
-    width: 100%; /* Ajustar el ancho en vista móvil */
+    border: solid #FAF7E6 1px;
+    box-shadow: 0 0 10px #000000;
+    border-radius: 20px;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
 }
 
-.menu-items {
+.date{
+    font-size: 15px;
+    margin: 10px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 20px;
-    width: 100%;
+    grid-template-columns: 1fr 1fr;
 }
 
-.menu-item {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #FAF7E6;
-    border-radius: 25px;
+.receipt-info{
+    list-style: none;
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    font-size: 20px;
+    border-top: #192847 2px dotted;
+    border-bottom: #192847 2px dotted;
+}
+
+.receipt-info li {
+    list-style: none;
     margin: 10px;
-    width: 100%;
+    font-size: 20px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 50px;
 }
 
-.menu-item img {
-    width: 100%;
-    height: auto;
-    border-radius: 25px;
+.total{
+    font-size: 20px;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
-.menu-item h3 {
-    margin-top: 10px;
-}
-
-.menu-item p {
-    margin-top: 10px;
-}
-
-.menu-item button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 25px;
-    background-color: #d48600;
-    color: #faf7e6;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.menu-item button:hover {
-    background-color: #192847;
-    color: #d48600;
-}
 
 /* RESPONSIVE PARA MOBILE*/
 @media screen and (max-width: 768px) {
@@ -199,22 +169,5 @@ body {
     .navbar-right a:hover {
         background-color: #d48600;
         border-radius: 25px; 
-    }
-
-    .menu-items {
-        grid-template-columns: 1fr;
-    }
-
-    .menu-category {
-        width: 90%;
-    }
-
-    .menu-item {
-        width: 100%;
-    }
-
-    .container {
-        padding: 15px;
-        margin-top: 90px;
     }
 }
