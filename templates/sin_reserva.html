@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sin Reserva Activa</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <script>
+        Swal.fire({
+            title: 'No tienes una reserva activa',
+            text: 'No tienes una reserva activa en este momento. No puedes realizar pedidos.',
+            icon: 'warning',
+            confirmButtonText: 'Aceptar',
+            didClose: () => {
+                window.location.href = "/inicio_usuario";
+            }
+        });
+    </script>
+    <style>
+         .swal2-cancel {
+            background-color: #192847 !important;
+            color: #fff !important;
+        }
+        .swal2-confirm {
+            background-color: #d48600 !important;
+            color: #fff !important;
+            width: 120px !important; 
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Pedidos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <!-- Link css -->
+    <link rel="stylesheet" href="/static/css/inicio.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
+    <link rel="stylesheet" href="../static/css/food-panel.css">
+    <link rel="stylesheet" href="../static/css/popup_panel.css">
+    <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+         .swal2-cancel {
+            background-color: #192847 !important;
+            color: #fff !important;
+        }
+        .swal2-confirm {
+            background-color: #d48600 !important;
+            color: #fff !important;
+            width: 120px !important; 
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .action-buttons button {
+            background-color: var(--alt-primary-color);
+            color: var(--light-color);
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .action-buttons button i {
+            pointer-events: none;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .group-by-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            gap: 5px; 
+        }
+
+        .group-by-container form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .group-by-container label {
+            font-size: 14px;
+        }
+
+        .group-by-container select {
+            font-size: 14px;
+            padding: 5px;
+            width: 150px; /* Ajustar el tamaño del select */
+        }
+
+        .new-reserva-button {
+            background-color: #192847;
+            color: #FAF7E6;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            width: auto;
+        }
+
+        .new-reserva-button:hover {
+            background-color: #d48600;
+            color: #192847;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-logo">
+            <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <button class="menu-toggle" id="mobile-menu">
+            <span class="fas fa-bars"></span>
+        </button>
+        <div class="navbar-right">
+            <a href="/inicio_usuario">Home</a>
+            <a href="/food-menu">Menu</a>
+            <a href="/game-menu">Productos</a>
+            <a href="/user_reservations">Reservas</a>
+            <a href="/ver_pedidos">Pedidos</a>
+            <a href="/perfil_user"><i class="fas fa-user"></i></a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="title">Mis Pedidos</div>
+        <div class="group-by-container">
+            <form method="GET" action="/ver_pedidos">
+                <label for="group_by">Agrupar por:</label>
+                <select name="group_by" id="group_by" onchange="this.form.submit()">
+                    <option value="Pendiente" {% if selected_group == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                    <option value="Cancelado" {% if selected_group == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+                    <option value="En progreso" {% if selected_group == 'En progreso' %}selected{% endif %}>En progreso</option>
+                    <option value="Entregado" {% if selected_group == 'Entregado' %}selected{% endif %}>Entregado</option>
+                </select>
+            </form>
+            <button class="new-reserva-button" onclick="window.location.href='/agregar_pedido'">Crear Nuevo Pedido</button>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha y Hora</th>
+                        <th>Estado</th>
+                        <th>Monto Total Bs</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos %}
+                    <tr>
+                        <td>{{ pedido.id_pedido }}</td>
+                        <td>{{ pedido.fecha_hora }}</td>
+                        <td>{{ pedido.estado }}</td>
+                        <td>{{ pedido.monto_total }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="viewPedidoBtn" data-id="{{ pedido.id_pedido }}"><i class="fa-solid fa-magnifying-glass"></i></button>
+                                {% if pedido.estado == 'Pendiente' %}
+                                <button class="cancelPedidoBtn" data-id="{{ pedido.id_pedido }}"><i class="fa-solid fa-trash"></i></button>
+                                {% endif %}
+                            </div>
+                        </td>                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.viewPedidoBtn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const idPedido = this.getAttribute('data-id');
+                window.location.href = `/userpedidos/${idPedido}`;
+            });
+        });
+
+        document.querySelectorAll('.cancelPedidoBtn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const idPedido = this.getAttribute('data-id');
+                Swal.fire({
+                    title: '¿Está seguro?',
+                    text: '¿Está seguro de cancelar el pedido?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, cancelar',
+                    cancelButtonText: 'No, cancelar',
+                    customClass: {
+                        confirmButton: 'swal2-confirm',
+                        cancelButton: 'swal2-cancel'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/cancelar_pedido/${idPedido}`, {
+                            method: 'POST'
+                        }).then(response => {
+                            if (response.ok) {
+                                Swal.fire('¡Cancelado!', 'El pedido ha sido cancelado.', 'success').then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error', 'No se pudo cancelar el pedido.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

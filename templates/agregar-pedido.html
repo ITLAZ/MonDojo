@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Pedido</title>
+    <link rel="stylesheet" href="../static/css/form-reserva.css">
+    <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        .custom-checkbox {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #1c1c1c;
+            border: 2px solid #d48600;
+            border-radius: 5px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .custom-checkbox input {
+            display: none;
+        }
+
+        .custom-checkbox input:checked + .checkmark::after {
+            content: '✔';
+            color: #d48600;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+        }
+
+        .checkmark {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #d48600;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #1c1c1c;
+            color: #d48600;
+        }
+
+        td img {
+            width: 50px;
+            height: auto;
+        }
+
+        select, input[type="number"], input[type="date"], input[type="time"] {
+            padding: 10px;
+            border: 1px solid #d48600;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #f0f0f0;
+        }
+
+        .eliminar-btn {
+            background: none;
+            border: none;
+            color: #d48600;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .eliminar-btn i {
+            font-size: 18px;
+        }
+
+        .continuar-btn {
+            background-color: #1c1c1c;
+            color: #d48600;
+            border: 1px solid #d48600;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .continuar-btn:hover {
+            background-color: #d48600;
+            color: #1c1c1c;
+        }
+        
+        .swal2-cancel {
+            background-color: #192847 !important;
+            color: #fff !important;
+        }
+
+        .swal2-confirm {
+            background-color: #d48600 !important;
+            color: #fff !important;
+            width: 120px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-logo">
+            <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <button class="menu-toggle" id="mobile-menu">
+            <span class="fas fa-bars"></span>
+        </button>
+        <div class="navbar-right">
+            <a href="/">Home</a>
+            <a href="#about">Sobre nosotros</a>
+            <a href="#menu">Menú</a>
+            <a href="#order">Ubicación</a>
+            <a href="/login">Iniciar Sesión</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="form-section">
+            <h2>Agregar Pedido</h2>
+            <form id="agregarPedidoForm" method="POST" action="/agregar_pedido">
+                <div class="mesas-section">
+                    <h3>Mesa Seleccionada</h3>
+                    <p>Mesa {{ reserva_activa.mesa.id_mesa }} - Capacidad: {{ reserva_activa.mesa.capacidad }} - Ubicación: {{ reserva_activa.mesa.ubicacion }}</p>
+                </div>
+                <div class="productos-section">
+                    <h3>Selecciona Productos</h3>
+                    <table id="productos-table">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Seleccionar</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos %}
+                            <tr>
+                                <td><img src="{{ url_for('static', filename='uploads/' ~ producto.imagen.split('/')[-1]) }}" alt="Imagen de {{ producto.nombre }}" width="50"></td>
+                                <td><input type="checkbox" class="producto-checkbox" data-id="{{ producto.id_producto }}" data-precio="{{ producto.precio }}"></td>
+                                <td>{{ producto.nombre }}</td>
+                                <td>{{ producto.precio }}</td>
+                                <td><input type="number" class="cantidad-producto" value="1" min="1"></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="productos-seleccionados-section">
+                    <h3>Productos Seleccionados</h3>
+                    <table id="productos-seleccionados-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <div>Total: $<span id="total">0.00</span></div>
+                </div>
+
+                <input type="hidden" name="productos">
+                <button type="button" id="realizarPedidoBtn">Realizar Pedido</button>
+                <button type="button" id="cancelarPedidoBtn">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmCancel() {
+            let confirmMessage = '¿Está seguro de cancelar? Se perderán los datos.';
+
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: confirmMessage,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No, mantener',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/inicio_usuario';
+                }
+            });
+        }
+
+        function showSuccessMessage(event, formId, message) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¡Éxito!',
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            }).then(() => {
+                document.getElementById(formId).submit();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const productosSeleccionadosList = document.querySelector('#productos-seleccionados-table tbody');
+            const totalElement = document.getElementById('total');
+
+            function updateTotal() {
+                let total = 0;
+                productosSeleccionadosList.querySelectorAll('tr').forEach(tr => {
+                    total += parseFloat(tr.dataset.total);
+                });
+                totalElement.innerText = total.toFixed(2);
+            }
+
+            function addProducto(id, nombre, precio, cantidad) {
+                const tr = document.createElement('tr');
+                tr.dataset.id = id;
+                tr.dataset.nombre = nombre;
+                tr.dataset.precio = precio;
+                tr.dataset.cantidad = cantidad;
+                tr.dataset.total = (precio * cantidad).toFixed(2);
+                tr.innerHTML = `
+                    <td>${nombre}</td>
+                    <td>${precio.toFixed(2)}</td>
+                    <td>${cantidad}</td>
+                    <td>${(precio * cantidad).toFixed(2)}</td>
+                    <td><button type="button" class="eliminar-btn"><i class="fas fa-trash-alt"></i></button></td>
+                `;
+                productosSeleccionadosList.appendChild(tr);
+                updateTotal();
+            }
+
+            document.querySelectorAll('.producto-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const id = this.dataset.id;
+                    const nombre = this.closest('tr').querySelector('td:nth-child(3)').innerText;
+                    const precio = parseFloat(this.dataset.precio);
+                    const cantidad = parseInt(this.closest('tr').querySelector('.cantidad-producto').value);
+
+                    if (this.checked) {
+                        addProducto(id, nombre, precio, cantidad);
+                    } else {
+                        productosSeleccionadosList.querySelector(`tr[data-id="${id}"]`).remove();
+                        updateTotal();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.cantidad-producto').forEach(input => {
+                input.addEventListener('change', function() {
+                    const id = this.closest('tr').querySelector('.producto-checkbox').dataset.id;
+                    const cantidad = parseInt(this.value);
+                    const productoTr = productosSeleccionadosList.querySelector(`tr[data-id="${id}"]`);
+                    if (productoTr) {
+                        productoTr.dataset.cantidad = cantidad;
+                        productoTr.dataset.total = (parseFloat(productoTr.dataset.precio) * cantidad).toFixed(2);
+                        productoTr.querySelector('td:nth-child(3)').innerText = cantidad;
+                        productoTr.querySelector('td:nth-child(4)').innerText = (parseFloat(productoTr.dataset.precio) * cantidad).toFixed(2);
+                        updateTotal();
+                    }
+                });
+            });
+
+            productosSeleccionadosList.addEventListener('click', function(e) {
+                if (e.target.classList.contains('eliminar-btn') || e.target.parentElement.classList.contains('eliminar-btn')) {
+                    e.target.closest('tr').remove();
+                    updateTotal();
+                }
+            });
+
+            document.querySelector('#realizarPedidoBtn').addEventListener('click', function(event) {
+                const productos = [];
+                productosSeleccionadosList.querySelectorAll('tr').forEach(tr => {
+                    productos.push(`${tr.dataset.id}:${tr.dataset.cantidad}`);
+                });
+                document.querySelector('input[name="productos"]').value = productos.join(',');
+
+                showSuccessMessage(event, 'agregarPedidoForm', 'Pedido realizado exitosamente.');
+            });
+
+            document.getElementById('cancelarPedidoBtn').addEventListener('click', confirmCancel);
+
+            updateTotal();
+        });
+    </script>
+</body>
+</html>

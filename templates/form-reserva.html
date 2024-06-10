@@ -1,3 +1,4 @@
+form-reserva.html
 <!DOCTYPE html>
 <html lang="es">
 
@@ -6,6 +7,7 @@
     <title>Formulario de Reserva</title>
     <link rel="stylesheet" href="../static/css/form-reserva.css">
     <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .hidden {
             display: none;
@@ -41,6 +43,74 @@
             width: 100%;
             height: 100%;
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #d48600;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #1c1c1c;
+            color: #d48600;
+        }
+
+        td img {
+            width: 50px;
+            height: auto;
+        }
+
+        select, input[type="number"], input[type="date"], input[type="time"] {
+            padding: 10px;
+            border: 1px solid #d48600;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #f0f0f0;
+        }
+
+        .eliminar-btn {
+            background: none;
+            border: none;
+            color: #d48600;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .eliminar-btn i {
+            font-size: 18px;
+        }
+
+        .continuar-btn {
+            background-color: #1c1c1c;
+            color: #d48600;
+            border: 1px solid #d48600;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .continuar-btn:hover {
+            background-color: #d48600;
+            color: #1c1c1c;
+        }
+        
+        .swal2-cancel {
+            background-color: #192847 !important;
+            color: #fff !important;
+        }
+
+        .swal2-confirm {
+            background-color: #d48600 !important;
+            color: #fff !important;
+            width: 120px !important;
+        }
     </style>
 </head>
 
@@ -58,6 +128,7 @@
             <a href="#menu">Menú</a>
             <a href="#order">Ubicación</a>
             <a href="/perfil_user"><i class="fas fa-user"></i></a>
+            <a href="#" id="helpBtn"><i class="fas fa-question-circle"></i></a>
         </div>
     </div>
     <div class="container">
@@ -73,7 +144,7 @@
                     <input type="time" id="end_time" name="end_time" required value="{{ hora_fin }}">
                 </div>
                 <button type="submit" class="continuar-btn {% if mesas_disponibles %}hidden{% endif %}">Continuar</button>
-                {% with messages = get_flashed_messages(with_categories=true) %}
+                <!-- {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         <ul class="flashes">
                             {% for category, message in messages %}
@@ -81,7 +152,7 @@
                             {% endfor %}
                         </ul>
                     {% endif %}
-                {% endwith %}
+                {% endwith %} -->
             </form>
 
             <!-- Mesas disponibles -->
@@ -196,13 +267,137 @@
                 <input type="hidden" name="productos">
                 <input type="hidden" name="juego">
                 <button type="submit" disabled>Confirmar Reserva</button>
-                <button type="button" onclick="window.location.href='/inicio_usuario'">Cancelar</button>
+                <button type="button" id="cancelarReservaBtn">Cancelar</button>
             </form>
         </div>
     </div>
 
+    <!-- Pop-up para ayuda -->
+    <div class="help-popup" id="helpPopup">
+        <div class="help-popup-content">
+            <span class="close-btn" onclick="closeHelpPopup()">&times;</span>
+            <h2>Guía de Reserva 🗒️</h2>
+            <ol>
+                <li>Selecciona la fecha de tu reserva. 📆</li>
+                <li>Selecciona la hora de inicio y fin de tu reserva. 🕦</li>
+                <li>Haz clic en "Continuar". ➡️</li>
+                <li>Elige una mesa de las disponibles. 🪑</li>
+                <li>Selecciona los productos y juegos que deseas agregar a tu reserva. 🍕</li>
+                <li>Haz clic en "Confirmar Reserva" para completar el proceso. ✅</li>
+            </ol>
+            <h2>Cosas a tomar en cuenta 🗒️</h2>
+            <ol>
+                <li>Tomar en cuenta la hora de estadía en restaurante es de 2 horas y medía máximo. 🕦</li>
+                <li>Las reservas solo se pueden hacer una vez por fecha. 🗓️</li>
+                <li>Las reservas de juegos solo se puede pedir 1 por reserva. 🃏</li>
+            </ol>
+        </div>
+    </div>
+
+    <style>
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #192847;
+        }
+
+        .help-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .help-popup-content {
+            position: relative;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            background-color: #FAF7E6;
+            border-radius: 10px;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .help-popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #192847;
+        }
+
+        .help-popup h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #d48600;
+            text-align: center;
+        }
+
+        .help-popup ol {
+            padding-left: 20px;
+            color: #192847;
+        }
+
+        .help-popup ol li {
+            margin-bottom: 10px;
+        }
+    </style>
+
     <script>
-<<<<<<< HEAD
+        function confirmCancel() {
+            let confirmMessage = '¿Está seguro de cancelar? Se perderán los datos.';
+
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: confirmMessage,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No, mantener',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/inicio_usuario';
+                }
+            });
+        }
+
+        function showSuccessMessage(event, formId, message) {
+            event.preventDefault();
+            Swal.fire({
+                title: '¡Éxito!',
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            }).then(() => {
+                document.getElementById(formId).submit();
+            });
+        }
+
+        document.getElementById('helpBtn').addEventListener('click', function() {
+            document.getElementById('helpPopup').style.display = 'block';
+        });
+
+        function closeHelpPopup() {
+            document.getElementById('helpPopup').style.display = 'none';
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const productosSeleccionadosList = document.querySelector('#productos-seleccionados-table tbody');
             const totalElement = document.getElementById('total');
@@ -230,7 +425,7 @@
                     <td>${precio.toFixed(2)}</td>
                     <td>${cantidad}</td>
                     <td>${(precio * cantidad).toFixed(2)}</td>
-                    <td><button type="button" class="eliminar-btn">Eliminar</button></td>
+                    <td><button type="button" class="eliminar-btn"><i class="fas fa-trash-alt"></i></button></td>
                 `;
                 productosSeleccionadosList.appendChild(tr);
                 updateTotal();
@@ -277,7 +472,7 @@
             });
 
             productosSeleccionadosList.addEventListener('click', function(e) {
-                if (e.target.classList.contains('eliminar-btn')) {
+                if (e.target.classList.contains('eliminar-btn') || e.target.closest('.eliminar-btn')) {
                     e.target.closest('tr').remove();
                     updateTotal();
                 }
@@ -309,6 +504,8 @@
                 });
                 this.querySelector('input[name="productos"]').value = productos.join(',');
                 this.querySelector('input[name="juego"]').value = juego;
+
+                showSuccessMessage(e, 'confirmarReservaForm', 'Reserva confirmada exitosamente.');
             });
 
             // Filtrar productos por categoría
@@ -334,11 +531,8 @@
                     }
                 });
             });
-=======
-        // Script para manejar el menú móvil
-        document.getElementById('mobile-menu').addEventListener('click', function () {
-            document.querySelector('.navbar-right').classList.toggle('active');
->>>>>>> 6db916589063b7aa2bbc7748cac169b07980d2e0
+
+            document.getElementById('cancelarReservaBtn').addEventListener('click', confirmCancel);
         });
     </script>
 </body>

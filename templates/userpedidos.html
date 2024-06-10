@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles del Pedido</title>
+    <link rel="stylesheet" href="../static/css/food-panel.css">
+    <link rel="stylesheet" href="../static/css/popup_panel.css">
+    <script src="https://kit.fontawesome.com/9c32bf538b.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .container {
+            padding: 20px;
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: #f9bf03; 
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .header-container div {
+            width: 48%;
+        }
+        .header-container div p {
+            margin: 5px 0;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .table-summary {
+            margin-top: 20px;
+            text-align: right;
+            background-color: #f9bf03; 
+            padding: 15px;
+            border-radius: 10px;
+            width: 250px; 
+            margin-left: auto;
+        }
+        .table-summary p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-logo">
+            <img src="../static/images/logo.png" alt="Monster Dojo">
+        </div>
+        <button class="menu-toggle" id="mobile-menu">
+            <span class="fas fa-bars"></span>
+        </button>
+        <div class="navbar-right">
+            <a href="/inicio_usuario">Home</a>
+            <a href="/food-menu">Menu</a>
+            <a href="/game-menu">Productos</a>
+            <a href="/user_reservations">Reservas</a>
+            <a href="/ver_pedidos">Pedidos</a>
+            <a href="/perfil_user"><i class="fas fa-user"></i></a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="title">Detalles del Pedido</div>
+        <div class="header-container">
+            <div>
+                <p><strong>Mesa:</strong> {{ mesa.ubicacion }}</p>
+            </div>
+            <div>
+                <p><strong>Fecha y hora del pedido:</strong> {{ pedido.fecha_hora }}</p>
+                <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio unitario</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                        <td>{{ producto.precio_unitario }}</td>
+                        <td>{{ producto.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="table-summary">
+            <p><strong>Total:</strong> {{ total_pedido }} Bs.</p>
+        </div>
+    </div>
+    <!-- Script Responsive Navbar -->
+    <script>
+        document.querySelector('.nav-hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-items').classList.toggle('nav-items-active');
+        });
+    </script>
+</body>
+</html>
