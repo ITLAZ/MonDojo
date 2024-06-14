@@ -60,11 +60,11 @@
             <h2>Recibo</h2>
             <div class="customer">
                 <label for="customer">Cliente:</label>
-                <p id="customer">{{ reserva.usuario.nombre }}</p>
+                <p id="customer">{{ pedido.usuario_rel.nombre }}</p>
             </div>
             <div class="date">
                 <label for="date">Fecha:</label>
-                <p id="date">{{ reserva.fecha_hora }}</p>
+                <p id="date">{{ pedido.fecha_hora.strftime('%Y-%m-%d %H:%M:%S') }}</p>
             </div>
             <ul class="receipt-info">
                 <li>
@@ -84,7 +84,7 @@
             </ul>
             <div class="total">
                 <label for="total">Total:</label>
-                <p id="total">{{ total_reserva }} Bs.</p>
+                <p id="total">{{ total_pedido }} Bs.</p>
             </div>
             <button class="print-btn" onclick="window.print()">Imprimir Recibo</button>
         </div>

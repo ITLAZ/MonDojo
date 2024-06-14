@@ -47,20 +47,6 @@
         .table-responsive {
             margin-top: 20px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #d48600;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #1c1c1c;
-            color: #d48600;
-        }
         .table-summary {
             margin-top: 20px;
             text-align: right;
@@ -72,6 +58,17 @@
         }
         .table-summary p {
             margin: 5px 0;
+        }
+        .recibo-btn {
+            display: block;
+            margin: 20px auto;
+            background-color: #d48600;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 120px;
         }
     </style>
 </head>
@@ -98,12 +95,12 @@
         <div class="title">Detalles del Pedido</div>
         <div class="header-container">
             <div>
-                <p><strong>Cliente:</strong> {{ reserva.usuario.nombre }}</p>
-                <p><strong>Mesa:</strong> {{ reserva.mesa.ubicacion }}</p>
+                <p><strong>Cliente:</strong> {{ pedido.usuario_rel.nombre }}</p>
+                <p><strong>Mesa:</strong> {{ pedido.mesa_rel.ubicacion }}</p>
             </div>
             <div>
-                <p><strong>Fecha y hora del pedido:</strong> {{ reserva.fecha_hora }}</p>
-                <p><strong>Estado:</strong> {{ reserva.estado }}</p>
+                <p><strong>Fecha y hora del pedido:</strong> {{ pedido.fecha_hora }}</p>
+                <p><strong>Estado:</strong> {{ pedido.estado }}</p>
             </div>
         </div>
         <div class="table-responsive">
@@ -117,20 +114,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in productos %}
+                    {% for producto in productos %}
                     <tr>
-                        <td>{{ item.nombre }}</td>
-                        <td>{{ item.cantidad }}</td>
-                        <td>{{ item.precio_unitario }}</td>
-                        <td>{{ item.total }}</td>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                        <td>{{ producto.precio_unitario }}</td>
+                        <td>{{ producto.total }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         <div class="table-summary">
-            <p><strong>Total:</strong> {{ total_reserva }} Bs.</p>
+            <p><strong>Total:</strong> {{ total_pedido }} Bs.</p>
         </div>
+        {% if pedido.estado == 'Finalizado' %}
+        <button class="recibo-btn" onclick="window.location.href='/receipt_pedido/{{ pedido.id_pedido }}'">Ver Recibo</button>
+        {% endif %}
     </div>
     <!-- Script Responsive Navbar -->
     <script>

@@ -47,20 +47,7 @@
         .table-responsive {
             margin-top: 20px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #d48600;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #1c1c1c;
-            color: #d48600;
-        }
+        
         .table-summary {
             margin-top: 20px;
             text-align: right;
@@ -73,6 +60,18 @@
         .table-summary p {
             margin: 5px 0;
         }
+
+        .recibo-btn {
+            display: block;
+            margin: 20px auto;
+            background-color: #d48600;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 120px;
+        }
     </style>
 </head>
 <body>
@@ -84,25 +83,25 @@
             <i class="fa fa-bars"></i>
         </div>
         <ul class="nav-items">
-            <li><a href="adminpanel.html">Inicio</a></li>
-            <li><a href="userspanel.html">Usuarios</a></li>
-            <li><a href="games-panel.html">Juegos</a></li>
-            <li><a href="food-panel.html">Comida</a></li>
-            <li><a href="registrar-mesas.html">Mesas</a></li>
-            <li><a href="reservas-panel.html">Reservas</a></li>
-            <li><a href="pedidos-panel.html">Pedidos</a></li>
-            <li><a href="perfil_admin.html"><i class="fa-solid fa-user-gear"></i></a></li>
+            <li><a href="/adminpanel">Inicio</a></li>
+            <li><a href="/userspanel">Usuarios</a></li>
+            <li><a href="/game_panel">Juegos</a></li>
+            <li><a href="/food_panel">Comida</a></li>
+            <li><a href="/registro_mesa">Mesas</a></li>
+            <li><a href="/reservas_panel">Reservas</a></li>
+            <li><a href="/pedidos_panel">Pedidos</a></li>
+            <li><a href="/perfil_admin"><i class="fa-solid fa-user-gear"></i></a></li>
         </ul>
     </nav>
     <div class="container">
-        <div class="title">Detalles del Pedido</div>
+        <div class="title">Detalles de la Reserva</div>
         <div class="header-container">
             <div>
                 <p><strong>Cliente:</strong> {{ reserva.usuario.nombre }}</p>
                 <p><strong>Mesa:</strong> {{ reserva.mesa.ubicacion }}</p>
             </div>
             <div>
-                <p><strong>Fecha y hora del pedido:</strong> {{ reserva.fecha_hora }}</p>
+                <p><strong>Fecha y hora de la reserva:</strong> {{ reserva.fecha_hora }}</p>
                 <p><strong>Estado:</strong> {{ reserva.estado }}</p>
             </div>
         </div>
@@ -131,6 +130,9 @@
         <div class="table-summary">
             <p><strong>Total:</strong> {{ total_reserva }} Bs.</p>
         </div>
+        {% if reserva.estado == 'Finalizado' %}
+        <button class="recibo-btn" onclick="window.location.href='/receipt/{{ reserva.id_reserva }}'">ver Recibo</button>
+        {% endif %}
     </div>
     <!-- Script Responsive Navbar -->
     <script>

@@ -116,10 +116,11 @@
             <form method="GET" action="/ver_pedidos">
                 <label for="group_by">Agrupar por:</label>
                 <select name="group_by" id="group_by" onchange="this.form.submit()">
+                    <option value="todos" {% if selected_group == 'todos' %}selected{% endif %}>Todos</option>
                     <option value="Pendiente" {% if selected_group == 'Pendiente' %}selected{% endif %}>Pendiente</option>
                     <option value="Cancelado" {% if selected_group == 'Cancelado' %}selected{% endif %}>Cancelado</option>
                     <option value="En progreso" {% if selected_group == 'En progreso' %}selected{% endif %}>En progreso</option>
-                    <option value="Entregado" {% if selected_group == 'Entregado' %}selected{% endif %}>Entregado</option>
+                    <option value="Finalizado" {% if selected_group == 'Finalizado' %}selected{% endif %}>Finalizado</option>
                 </select>
             </form>
             <button class="new-reserva-button" onclick="window.location.href='/agregar_pedido'">Crear Nuevo Pedido</button>

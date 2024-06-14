@@ -127,6 +127,7 @@
                     <option value="todas" {% if selected_group == 'todas' %}selected{% endif %}>Todas</option>
                     <option value="reservados" {% if selected_group == 'reservados' %}selected{% endif %}>Reservados</option>
                     <option value="cancelado" {% if selected_group == 'cancelado' %}selected{% endif %}>Cancelado</option>
+
                 </select>
                 <input type="hidden" name="search" value="{{ search_query }}">
                 <input type="hidden" name="sort_by" id="sort_by" value="{{ sort_by }}">
@@ -166,6 +167,9 @@
                                 {% if reserva.estado == 'Reservado' %}
                                 <button class="verDetallesBtn" data-id="{{ reserva.id_reserva }}"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
                                 <button class="deleteReservaBtn" data-id="{{ reserva.id_reserva }}"><i class="fa-solid fa-trash"></i></button>
+                                {% elif reserva.estado == 'Finalizado' %}
+                                <button class="verDetallesBtn" data-id="{{ reserva.id_reserva }}"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+
                                 {% endif %}
                             </div>
                         </td>                        

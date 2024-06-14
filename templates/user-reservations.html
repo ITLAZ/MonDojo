@@ -120,6 +120,7 @@
                     <option value="todas" {% if selected_group == 'todas' %}selected{% endif %}>Todas</option>
                     <option value="reservados" {% if selected_group == 'reservados' %}selected{% endif %}>Reservados</option>
                     <option value="cancelado" {% if selected_group == 'cancelado' %}selected{% endif %}>Cancelado</option>
+
                 </select>
             </form>
             <button class="new-reserva-button" onclick="window.location.href='/form_reserva'">Crear Nueva Reserva</button>
@@ -148,6 +149,8 @@
                                 {% if reserva.estado == 'Reservado' %}
                                 <button class="editReservaBtn" data-id="{{ reserva.id_reserva }}"><i class="fa-solid fa-edit"></i></button>
                                 <button class="deleteReservaBtn" data-id="{{ reserva.id_reserva }}"><i class="fa-solid fa-trash"></i></button>
+                                {% elif reserva.estado == 'Finalizado' %}
+                                <button class="verDetallesBtn" data-id="{{ reserva.id_reserva }}"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
                                 {% endif %}
                             </div>
                         </td>                        
@@ -195,6 +198,13 @@
                         });
                     }
                 });
+            });
+        });
+
+        document.querySelectorAll('.verDetallesBtn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const idReserva = this.getAttribute('data-id');
+                window.location.href = `/receipt_reserva/${idReserva}`;
             });
         });
     </script>

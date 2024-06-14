@@ -672,19 +672,16 @@ def game_panel():
 
     return render_template('games-panel.html', juegos=juegos, categorias=categorias, selected_category=group_by)
 
-# Ruta para agregar un nuevo juego
 @app.route('/add_game', methods=['POST'])
 @login_required
 def add_game():
     nombre = request.form.get('nombre')
     descripcion = request.form.get('descripcion')
     precio_alquiler = request.form.get('precio_alquiler')
-    precio_venta = request.form.get('precio_venta')
-    disponible_venta = request.form.get('disponible_venta') == 'on'
     categoria_id = request.form.get('categoria')
     imagen = request.files.get('imagen')
 
-    if not nombre or not descripcion or not precio_alquiler or not precio_venta or not categoria_id or not imagen:
+    if not nombre or not descripcion or not precio_alquiler or not categoria_id or not imagen:
         flash('Todos los campos son obligatorios.', 'error')
         return redirect(url_for('game_panel'))
 
@@ -701,8 +698,8 @@ def add_game():
         nombre=nombre,
         descripcion=descripcion,
         precio_alquiler=float(precio_alquiler),
-        precio_venta=float(precio_venta),
-        disponible_venta=disponible_venta,
+        precio_venta=0,  # Precio de venta predefinido como 0
+        disponible_venta=False,  # Disponible para venta predefinido como False
         imagen=filepath,
         categoria_juego_id_catJuego=int(categoria_id),
         activo=True  # Establecer el juego como activo
@@ -717,6 +714,7 @@ def add_game():
 
     return redirect(url_for('game_panel'))
 
+
 # Ruta para obtener la información de un juego específico
 @app.route('/get_game/<int:juego_id>')
 @login_required
@@ -726,8 +724,6 @@ def get_game(juego_id):
         'nombre': juego.nombre,
         'descripcion': juego.descripcion,
         'precio_alquiler': juego.precio_alquiler,
-        'precio_venta': juego.precio_venta,
-        'disponible_venta': juego.disponible_venta,
         'categoria_juego_id_catJuego': juego.categoria_juego_id_catJuego
     })
 
@@ -740,8 +736,8 @@ def update_game(game_id):
     game.nombre = request.form.get('nombre')
     game.descripcion = request.form.get('descripcion')
     game.precio_alquiler = float(request.form.get('precio_alquiler'))
-    game.precio_venta = float(request.form.get('precio_venta'))
-    game.disponible_venta = request.form.get('disponible_venta') == 'on'
+    game.precio_venta = 0  # Precio de venta predefinido como 0
+    game.disponible_venta = False  # Disponible para venta predefinido como False
     game.categoria_juego_id_catJuego = int(request.form.get('categoria'))
 
     imagen = request.files.get('imagen')
@@ -1239,6 +1235,8 @@ def calcular_monto_total(reserva):
     monto_total = sum([p.precio * p.cantidad for p in productos]) + sum([j.precio * j.cantidad for j in juegos])
     return monto_total
 
+from datetime import datetime
+
 @app.route('/reservas_panel', methods=['GET'])
 @login_required
 def reservas_panel():
@@ -1247,6 +1245,7 @@ def reservas_panel():
     sort_by = request.args.get('sort_by', 'id_reserva')
     sort_order = request.args.get('sort_order', 'asc')
 
+    # Obtener todas las reservas
     reservas_query = Reserva.query.join(Usuario).filter(
         Usuario.nombre.ilike(f'%{search_query}%')
     )
@@ -1263,12 +1262,16 @@ def reservas_panel():
 
     reservas = reservas_query.all()
 
-    # Calcular monto total de cada reserva
+    # Calcular monto total de cada reserva y actualizar estado si es necesario
     for reserva in reservas:
+        if reserva.fecha_hora < datetime.now() and reserva.estado == 'Reservado':
+            reserva.estado = 'Finalizado'
+            db.session.commit()  # Guardar el cambio de estado en la base de datos
         reserva.monto_total = calcular_monto_total(reserva)
 
     return render_template('reservas-panel.html', reservas=reservas, selected_group=group_by, search_query=search_query, sort_by=sort_by, sort_order=sort_order)
 
+#---------------------------------------------------------------
 @app.route('/cancel_reserva/<int:id_reserva>', methods=['POST'])
 @login_required
 def cancel_reserva(id_reserva):
@@ -1320,8 +1323,40 @@ def ver_detalle_reserva(id_reserva):
 
     return render_template('verDetalle-reserva.html', reserva=reserva, cliente=cliente, mesa=mesa, productos=productos, total_reserva=total_reserva)
 
+@app.route('/receipt/<int:id_reserva>', methods=['GET'])
+@login_required
+def receipt(id_reserva):
+    reserva = Reserva.query.get_or_404(id_reserva)
+    cliente = reserva.usuario
+    detalle_reservas = DetalleReserva.query.filter_by(reserva_id_reserva=id_reserva).all()
+    registro_juego = RegistroJuego.query.filter_by(reserva_id_reserva=id_reserva).first()
 
+    productos = []
+    for detalle in detalle_reservas:
+        producto = {
+            'nombre': detalle.producto_rel.nombre,
+            'cantidad': detalle.cantidad,
+            'precio_unitario': detalle.precio,
+            'total': detalle.cantidad * detalle.precio
+        }
+        productos.append(producto)
 
+    total_reserva = sum([producto['total'] for producto in productos])
+
+    if registro_juego:
+        juego = {
+            'nombre': registro_juego.juego_rel.nombre,
+            'cantidad': 1,  # Supongo que la cantidad de juegos es siempre 1 por reserva
+            'precio_unitario': registro_juego.precio,
+            'total': registro_juego.precio
+        }
+        productos.append(juego)
+        total_reserva += juego['total']
+
+    return render_template('receipt.html', reserva=reserva, cliente=cliente, productos=productos, total_reserva=total_reserva)
+#---------------------------------------------------------------
+
+# agregar pedido - usuario
 @app.route('/agregar_pedido', methods=['GET', 'POST'])
 @login_required
 def agregar_pedido():
@@ -1371,19 +1406,17 @@ def agregar_pedido():
     return render_template('agregar-pedido.html', productos=productos, reserva_activa=reserva_activa)
 
 
-
-
-
-
-
-
-
 #ver pedidos - usuario
 @app.route('/ver_pedidos', methods=['GET'])
 @login_required
 def ver_pedidos():
-    group_by = request.args.get('group_by', 'Pendiente')
-    pedidos = Pedido.query.filter_by(usuario_id_usuario=current_user.id_usuario, estado=group_by).all()
+    group_by = request.args.get('group_by', 'todos')
+    pedidos_query = Pedido.query.filter_by(usuario_id_usuario=current_user.id_usuario)
+    
+    if group_by != 'todos':
+        pedidos_query = pedidos_query.filter_by(estado=group_by)
+    
+    pedidos = pedidos_query.all()
 
     pedidos_con_totales = []
     for pedido in pedidos:
@@ -1434,6 +1467,60 @@ def userspedidos(pedido_id):
 
     return render_template('userpedidos.html', pedido=pedido, productos=productos, total_pedido=total_pedido, mesa=mesa)
 
+
+@app.route('/receipt_pedidoUser/<int:pedido_id>', methods=['GET'])
+@login_required
+def receipt_pedidoUser(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    detalles_pedido = DetallePedido.query.filter_by(pedido_id_pedido=pedido_id).all()
+
+    productos = []
+    for detalle in detalles_pedido:
+        producto = {
+            'nombre': detalle.producto_rel.nombre,
+            'cantidad': detalle.cantidad,
+            'precio_unitario': detalle.precio,
+            'total': detalle.cantidad * detalle.precio
+        }
+        productos.append(producto)
+
+    total_pedido = sum([producto['total'] for producto in productos])
+
+    return render_template('receipt_pedidoUser.html', pedido=pedido, productos=productos, total_pedido=total_pedido)
+
+@app.route('/receipt_reserva/<int:reserva_id>', methods=['GET'])
+@login_required
+def receipt_reserva(reserva_id):
+    reserva = Reserva.query.get_or_404(reserva_id)
+    detalles_reserva = DetalleReserva.query.filter_by(reserva_id_reserva=reserva_id).all()
+    registro_juego = RegistroJuego.query.filter_by(reserva_id_reserva=reserva_id).first()
+
+    productos = []
+    for detalle in detalles_reserva:
+        producto = {
+            'nombre': detalle.producto_rel.nombre,
+            'cantidad': detalle.cantidad,
+            'precio_unitario': detalle.precio,
+            'total': detalle.cantidad * detalle.precio
+        }
+        productos.append(producto)
+
+    total_reserva = sum([producto['total'] for producto in productos])
+
+    if registro_juego:
+        juego = {
+            'nombre': registro_juego.juego_rel.nombre,
+            'cantidad': 1,  # Supongo que la cantidad de juegos es siempre 1 por reserva
+            'precio_unitario': registro_juego.precio,
+            'total': registro_juego.precio
+        }
+        productos.append(juego)
+        total_reserva += juego['total']
+
+    return render_template('receipt.html', reserva=reserva, productos=productos, total_reserva=total_reserva)
+
+
+#---------------------
 
 
 
@@ -1528,6 +1615,26 @@ def ver_detalle_pedido(pedido_id):
 
     return render_template('verDetalle-pedido.html', pedido=pedido, productos=productos, total_pedido=total_pedido)
 
+#recibo-pedido-admin
+@app.route('/receipt_pedido/<int:pedido_id>', methods=['GET'])
+@login_required
+def receipt_pedido(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    detalles_pedido = DetallePedido.query.filter_by(pedido_id_pedido=pedido_id).all()
+
+    productos = []
+    for detalle in detalles_pedido:
+        producto = {
+            'nombre': detalle.producto_rel.nombre,
+            'cantidad': detalle.cantidad,
+            'precio_unitario': detalle.precio,
+            'total': detalle.cantidad * detalle.precio
+        }
+        productos.append(producto)
+
+    total_pedido = sum([producto['total'] for producto in productos])
+
+    return render_template('receipt_pedido.html', pedido=pedido, productos=productos, total_pedido=total_pedido)
 
 
 

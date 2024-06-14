@@ -192,8 +192,6 @@
                         <th>Nombre <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='nombre', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'nombre') == 'nombre' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
                         <th>Descripción <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='descripcion', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'descripcion') == 'descripcion' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
                         <th>Precio Alquiler <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='precio_alquiler', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'precio_alquiler') == 'precio_alquiler' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
-                        <th>Precio Venta <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='precio_venta', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'precio_venta') == 'precio_venta' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
-                        <th>Disponible Venta <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='disponible_venta', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'disponible_venta') == 'disponible_venta' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
                         <th>Imagen</th>
                         <th>Categoría <a href="{{ url_for('game_panel', search=request.args.get('search', ''), sort_by='categoria_juego_id_catJuego', sort_order='desc' if request.args.get('sort_order', 'asc') == 'asc' and request.args.get('sort_by', 'categoria_juego_id_catJuego') == 'categoria_juego_id_catJuego' else 'asc') }}"><button class="filter-btn"><i class="fa-solid fa-sort"></i></button></a></th>
                         <th>Acciones</th>
@@ -206,8 +204,6 @@
                         <td>{{ juego.nombre }}</td>
                         <td>{{ juego.descripcion }}</td>
                         <td>{{ juego.precio_alquiler }}</td>
-                        <td>{{ juego.precio_venta }}</td>
-                        <td>{{ juego.disponible_venta }}</td>
                         <td><img src="{{ juego.imagen }}" alt="Imagen de {{ juego.nombre }}" width="100"></td>
                         <td>{{ juego.categoria_juego.nombre }}</td>
                         <td>
@@ -260,21 +256,8 @@
                         <input type="number" id="precio_alquiler" name="precio_alquiler" step="0.01" required>
                         <span class="error-message" id="error-precio_alquiler"></span>
                     </div>
-                    <div class="form-group">
-                        <label for="precio_venta">Precio Venta</label>
-                        <input type="number" id="precio_venta" name="precio_venta" step="0.01" required>
-                        <span class="error-message" id="error-precio_venta"></span>
-                    </div>
                 </div>
                 <div class="tab">
-                    <div class="form-group">
-                        <label for="disponible_venta">Disponible Venta</label>
-                        <label class="custom-checkbox">
-                            <input type="checkbox" id="disponible_venta" name="disponible_venta">
-                            <span class="checkmark"></span>
-                        </label>
-                        <span class="error-message" id="error-disponible_venta"></span>
-                    </div>
                     <div class="form-group">
                         <label for="imagen">Imagen</label>
                         <input type="file" id="imagen" name="imagen" accept="image/png, image/jpeg, image/jpg" required>
@@ -330,21 +313,8 @@
                         <input type="number" id="edit_precio_alquiler" name="precio_alquiler" step="0.01" required>
                         <span class="error-message" id="edit-error-precio_alquiler"></span>
                     </div>
-                    <div class="form-group">
-                        <label for="edit_precio_venta">Precio Venta</label>
-                        <input type="number" id="edit_precio_venta" name="precio_venta" step="0.01" required>
-                        <span class="error-message" id="edit-error-precio_venta"></span>
-                    </div>
                 </div>
                 <div class="tab">
-                    <div class="form-group">
-                        <label for="edit_disponible_venta">Disponible Venta</label>
-                        <label class="custom-checkbox">
-                            <input type="checkbox" id="edit_disponible_venta" name="disponible_venta">
-                            <span class="checkmark"></span>
-                        </label>
-                        <span class="error-message" id="edit-error-disponible_venta"></span>
-                    </div>
                     <div class="form-group">
                         <label for="edit_imagen">Imagen</label>
                         <input type="file" id="edit_imagen" name="imagen" accept="image/png, image/jpeg, image/jpg">
@@ -461,24 +431,23 @@
             }
         }
         document.querySelectorAll('.editGameBtn').forEach(button => {
-            button.addEventListener('click', function() {
-                const gameId = button.getAttribute('data-id');
-                fetch(`/get_game/${gameId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('edit_nombre').value = data.nombre;
-                        document.getElementById('edit_descripcion').value = data.descripcion;
-                        document.getElementById('edit_precio_alquiler').value = data.precio_alquiler;
-                        document.getElementById('edit_precio_venta').value = data.precio_venta;
-                        document.getElementById('edit_disponible_venta').checked = data.disponible_venta;
-                        document.getElementById('edit_categoria').value = data.categoria_juego_id_catJuego;
-                        document.getElementById('editForm').action = `/update_game/${gameId}`;
-                        document.getElementById('editPopup').style.display = 'block';
-                        showEditTab(0);
-                    })
-                    .catch(error => console.error('Error loading the game data:', error));
-            });
-        });
+    button.addEventListener('click', function() {
+        const gameId = button.getAttribute('data-id');
+        fetch(`/get_game/${gameId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit_nombre').value = data.nombre;
+                document.getElementById('edit_descripcion').value = data.descripcion;
+                document.getElementById('edit_precio_alquiler').value = data.precio_alquiler;
+                document.getElementById('edit_categoria').value = data.categoria_juego_id_catJuego;
+                document.getElementById('editForm').action = `/update_game/${gameId}`;
+                document.getElementById('editPopup').style.display = 'block';
+                showEditTab(0);
+            })
+            .catch(error => console.error('Error loading the game data:', error));
+    });
+});
+
 
         function closePopup() {
             document.getElementById('contactPopup').style.display = 'none';
